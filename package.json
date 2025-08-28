@@ -1,0 +1,13 @@
+{
+  "name": "mercredis-foot",
+  "version": "1.0.0",
+  "description": "Liste des mercredis avec jeu de foot et entrainement individuel, persistés en JSON.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "regen": "FORCE_REGEN=1 node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

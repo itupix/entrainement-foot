@@ -1,0 +1,191 @@
+{
+  "jeuxFoot": [
+    {
+      "id": "J01",
+      "nom": "Rondo 4v2",
+      "description": "Conservation de balle en supériorité numérique, avec pression des deux défenseurs au centre.",
+      "materiel": [
+        "plots pour le carré",
+        "ballon"
+      ]
+    },
+    {
+      "id": "J02",
+      "nom": "Jeu des 4 buts",
+      "description": "Deux équipes s’affrontent avec 4 petits buts disposés aux coins. Objectif : marquer dans n’importe quel but",
+      "materiel": [
+        "4 mini-buts",
+        "plots",
+        "ballon"
+      ]
+    },
+    {
+      "id": "J03",
+      "nom": "Possession 5 passes",
+      "description": "Marquer un point à chaque série de 5 passes consécutives réussies.",
+      "materiel": [
+        "plots pour délimiter la zone",
+        "ballon"
+      ]
+    },
+    {
+      "id": "J04",
+      "nom": "Match à thème: 2 touches",
+      "description": "Match classique mais chaque joueur est limité à 2 touches de balle.",
+      "materiel": [
+        "buts",
+        "ballon",
+        "chasubles"
+      ]
+    },
+    {
+      "id": "J05",
+      "nom": "Relais passe-tir",
+      "description": "Par équipes, enchaîner passe, contrôle et tir au but le plus rapidement possible.",
+      "materiel": [
+        "plots",
+        "ballon",
+        "buts"
+      ]
+    },
+    {
+      "id": "J06",
+      "nom": "Conservation en losange",
+      "description": "Jeu de possession avec 4 appuis extérieurs et 2-3 joueurs au milieu pour garder le ballon.",
+      "materiel": [
+        "plots pour le losange",
+        "ballon"
+      ]
+    },
+    {
+      "id": "J07",
+      "nom": "3 zones progression",
+      "description": "Terrrain divisé en 3 zones, l’équipe doit progresser avec passes successives pour atteindre le but.",
+      "materiel": [
+        "plots",
+        "ballon",
+        "buts"
+      ]
+    },
+    {
+      "id": "J08",
+      "nom": "Contre-attaque 3v2",
+      "description": "Lancement d’attaques rapides en supériorité numérique contre deux défenseurs.",
+      "materiel": [
+        "ballon",
+        "buts",
+        "plots"
+      ]
+    },
+    {
+      "id": "J09",
+      "nom": "Jeu du chiffre",
+      "description": "Chaque joueur a un numéro ; quand son numéro est appelé, il entre pour un duel 1v1 ou 2v2.",
+      "materiel": [
+        "plots",
+        "ballon",
+        "buts"
+      ]
+    },
+    {
+      "id": "J10",
+      "nom": "Tennis-ballon",
+      "description": "Deux équipes séparées par une ligne ou un filet, échanges avec ballon de foot sans qu’il tombe plus d’une fois.",
+      "materiel": [
+        "plots ou filet bas",
+        "ballon"
+      ]
+    }
+  ],
+  "entrainements": [
+    {
+      "id": "E01",
+      "nom": "Slalom conduite de balle",
+      "description": "Dribbles rapides entre plots pour travailler la maîtrise et la vitesse.",
+      "materiel": [
+        "plots",
+        "ballon"
+      ]
+    },
+    {
+      "id": "E02",
+      "nom": "Feintes et changements de direction",
+      "description": "Réaliser différentes feintes avant de changer de direction avec le ballon.",
+      "materiel": [
+        "plots",
+        "ballon"
+      ]
+    },
+    {
+      "id": "E03",
+      "nom": "Contrôle orienté + passe",
+      "description": "Recevoir le ballon, l’orienter vers l’espace libre et enchaîner une passe précise.",
+      "materiel": [
+        "ballon",
+        "plots"
+      ]
+    },
+    {
+      "id": "E04",
+      "nom": "Maîtrise pied faible",
+      "description": "Séries de passes et frappes uniquement avec le pied le moins dominant.",
+      "materiel": [
+        "ballon",
+        "buts",
+        "plots"
+      ]
+    },
+    {
+      "id": "E05",
+      "nom": "Jonglerie objectifs",
+      "description": "Enchaîner un nombre défini de jongles, éventuellement avec alternance pied droit/gauche.",
+      "materiel": [
+        "ballon"
+      ]
+    },
+    {
+      "id": "E06",
+      "nom": "Finition rapide",
+      "description": "Recevoir une passe et frapper immédiatement au but.",
+      "materiel": [
+        "ballon",
+        "buts"
+      ]
+    },
+    {
+      "id": "E07",
+      "nom": "Passes longues précision",
+      "description": "Travailler la précision des passes longues entre deux zones.",
+      "materiel": [
+        "plots pour les zones",
+        "ballon"
+      ]
+    },
+    {
+      "id": "E08",
+      "nom": "Dribbles 1v1 couloir",
+      "description": "Duel attaquant/défenseur dans un couloir étroit, objectif : éliminer ou défendre.",
+      "materiel": [
+        "plots",
+        "ballon"
+      ]
+    },
+    {
+      "id": "E09",
+      "nom": "Coordination échelles",
+      "description": "Exercices d’appuis rapides avec une échelle de rythme au sol.",
+      "materiel": [
+        "échelle de rythme"
+      ]
+    },
+    {
+      "id": "E10",
+      "nom": "Agilité plots/haies",
+      "description": "Petits sauts rapides et changements de direction pour développer l’agilité.",
+      "materiel": [
+        "plots",
+        "petites haies"
+      ]
+    }
+  ]
+}

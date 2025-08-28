@@ -1,0 +1,4762 @@
+{
+  "generatedAt": "2025-08-28T12:41:57.037Z",
+  "startDate": "2025-09-03",
+  "endDate": "2026-07-01",
+  "total": 44,
+  "items": [
+    {
+      "date": "2025-09-03",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J01",
+        "nom": "Rondo 4v2",
+        "description": "Conservation de balle en supériorité numérique, avec pression des deux défenseurs au centre.",
+        "materiel": [
+          "plots pour le carré",
+          "ballon"
+        ]
+      },
+      "entrainement": {
+        "id": "E01",
+        "nom": "Slalom conduite de balle",
+        "description": "Dribbles rapides entre plots pour travailler la maîtrise et la vitesse.",
+        "materiel": [
+          "plots",
+          "ballon"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E01",
+            "nom": "Slalom conduite de balle",
+            "description": "Dribbles rapides entre plots pour travailler la maîtrise et la vitesse.",
+            "materiel": [
+              "plots",
+              "ballon"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J01",
+            "nom": "Rondo 4v2",
+            "description": "Conservation de balle en supériorité numérique, avec pression des deux défenseurs au centre.",
+            "materiel": [
+              "plots pour le carré",
+              "ballon"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2025-09-10",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J02",
+        "nom": "Jeu des 4 buts",
+        "description": "Deux équipes s’affrontent avec 4 petits buts disposés aux coins. Objectif : marquer dans n’importe quel but",
+        "materiel": [
+          "4 mini-buts",
+          "plots",
+          "ballon"
+        ]
+      },
+      "entrainement": {
+        "id": "E02",
+        "nom": "Feintes et changements de direction",
+        "description": "Réaliser différentes feintes avant de changer de direction avec le ballon.",
+        "materiel": [
+          "plots",
+          "ballon"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E02",
+            "nom": "Feintes et changements de direction",
+            "description": "Réaliser différentes feintes avant de changer de direction avec le ballon.",
+            "materiel": [
+              "plots",
+              "ballon"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J02",
+            "nom": "Jeu des 4 buts",
+            "description": "Deux équipes s’affrontent avec 4 petits buts disposés aux coins. Objectif : marquer dans n’importe quel but",
+            "materiel": [
+              "4 mini-buts",
+              "plots",
+              "ballon"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2025-09-17",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J03",
+        "nom": "Possession 5 passes",
+        "description": "Marquer un point à chaque série de 5 passes consécutives réussies.",
+        "materiel": [
+          "plots pour délimiter la zone",
+          "ballon"
+        ]
+      },
+      "entrainement": {
+        "id": "E03",
+        "nom": "Contrôle orienté + passe",
+        "description": "Recevoir le ballon, l’orienter vers l’espace libre et enchaîner une passe précise.",
+        "materiel": [
+          "ballon",
+          "plots"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E03",
+            "nom": "Contrôle orienté + passe",
+            "description": "Recevoir le ballon, l’orienter vers l’espace libre et enchaîner une passe précise.",
+            "materiel": [
+              "ballon",
+              "plots"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J03",
+            "nom": "Possession 5 passes",
+            "description": "Marquer un point à chaque série de 5 passes consécutives réussies.",
+            "materiel": [
+              "plots pour délimiter la zone",
+              "ballon"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2025-09-24",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J04",
+        "nom": "Match à thème: 2 touches",
+        "description": "Match classique mais chaque joueur est limité à 2 touches de balle.",
+        "materiel": [
+          "buts",
+          "ballon",
+          "chasubles"
+        ]
+      },
+      "entrainement": {
+        "id": "E04",
+        "nom": "Maîtrise pied faible",
+        "description": "Séries de passes et frappes uniquement avec le pied le moins dominant.",
+        "materiel": [
+          "ballon",
+          "buts",
+          "plots"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E04",
+            "nom": "Maîtrise pied faible",
+            "description": "Séries de passes et frappes uniquement avec le pied le moins dominant.",
+            "materiel": [
+              "ballon",
+              "buts",
+              "plots"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J04",
+            "nom": "Match à thème: 2 touches",
+            "description": "Match classique mais chaque joueur est limité à 2 touches de balle.",
+            "materiel": [
+              "buts",
+              "ballon",
+              "chasubles"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2025-10-01",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J05",
+        "nom": "Relais passe-tir",
+        "description": "Par équipes, enchaîner passe, contrôle et tir au but le plus rapidement possible.",
+        "materiel": [
+          "plots",
+          "ballon",
+          "buts"
+        ]
+      },
+      "entrainement": {
+        "id": "E05",
+        "nom": "Jonglerie objectifs",
+        "description": "Enchaîner un nombre défini de jongles, éventuellement avec alternance pied droit/gauche.",
+        "materiel": [
+          "ballon"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E05",
+            "nom": "Jonglerie objectifs",
+            "description": "Enchaîner un nombre défini de jongles, éventuellement avec alternance pied droit/gauche.",
+            "materiel": [
+              "ballon"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J05",
+            "nom": "Relais passe-tir",
+            "description": "Par équipes, enchaîner passe, contrôle et tir au but le plus rapidement possible.",
+            "materiel": [
+              "plots",
+              "ballon",
+              "buts"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2025-10-08",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J06",
+        "nom": "Conservation en losange",
+        "description": "Jeu de possession avec 4 appuis extérieurs et 2-3 joueurs au milieu pour garder le ballon.",
+        "materiel": [
+          "plots pour le losange",
+          "ballon"
+        ]
+      },
+      "entrainement": {
+        "id": "E06",
+        "nom": "Finition rapide",
+        "description": "Recevoir une passe et frapper immédiatement au but.",
+        "materiel": [
+          "ballon",
+          "buts"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E06",
+            "nom": "Finition rapide",
+            "description": "Recevoir une passe et frapper immédiatement au but.",
+            "materiel": [
+              "ballon",
+              "buts"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J06",
+            "nom": "Conservation en losange",
+            "description": "Jeu de possession avec 4 appuis extérieurs et 2-3 joueurs au milieu pour garder le ballon.",
+            "materiel": [
+              "plots pour le losange",
+              "ballon"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2025-10-15",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J07",
+        "nom": "3 zones progression",
+        "description": "Terrrain divisé en 3 zones, l’équipe doit progresser avec passes successives pour atteindre le but.",
+        "materiel": [
+          "plots",
+          "ballon",
+          "buts"
+        ]
+      },
+      "entrainement": {
+        "id": "E07",
+        "nom": "Passes longues précision",
+        "description": "Travailler la précision des passes longues entre deux zones.",
+        "materiel": [
+          "plots pour les zones",
+          "ballon"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E07",
+            "nom": "Passes longues précision",
+            "description": "Travailler la précision des passes longues entre deux zones.",
+            "materiel": [
+              "plots pour les zones",
+              "ballon"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J07",
+            "nom": "3 zones progression",
+            "description": "Terrrain divisé en 3 zones, l’équipe doit progresser avec passes successives pour atteindre le but.",
+            "materiel": [
+              "plots",
+              "ballon",
+              "buts"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2025-10-22",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J08",
+        "nom": "Contre-attaque 3v2",
+        "description": "Lancement d’attaques rapides en supériorité numérique contre deux défenseurs.",
+        "materiel": [
+          "ballon",
+          "buts",
+          "plots"
+        ]
+      },
+      "entrainement": {
+        "id": "E08",
+        "nom": "Dribbles 1v1 couloir",
+        "description": "Duel attaquant/défenseur dans un couloir étroit, objectif : éliminer ou défendre.",
+        "materiel": [
+          "plots",
+          "ballon"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E08",
+            "nom": "Dribbles 1v1 couloir",
+            "description": "Duel attaquant/défenseur dans un couloir étroit, objectif : éliminer ou défendre.",
+            "materiel": [
+              "plots",
+              "ballon"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J08",
+            "nom": "Contre-attaque 3v2",
+            "description": "Lancement d’attaques rapides en supériorité numérique contre deux défenseurs.",
+            "materiel": [
+              "ballon",
+              "buts",
+              "plots"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2025-10-29",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J09",
+        "nom": "Jeu du chiffre",
+        "description": "Chaque joueur a un numéro ; quand son numéro est appelé, il entre pour un duel 1v1 ou 2v2.",
+        "materiel": [
+          "plots",
+          "ballon",
+          "buts"
+        ]
+      },
+      "entrainement": {
+        "id": "E09",
+        "nom": "Coordination échelles",
+        "description": "Exercices d’appuis rapides avec une échelle de rythme au sol.",
+        "materiel": [
+          "échelle de rythme"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E09",
+            "nom": "Coordination échelles",
+            "description": "Exercices d’appuis rapides avec une échelle de rythme au sol.",
+            "materiel": [
+              "échelle de rythme"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J09",
+            "nom": "Jeu du chiffre",
+            "description": "Chaque joueur a un numéro ; quand son numéro est appelé, il entre pour un duel 1v1 ou 2v2.",
+            "materiel": [
+              "plots",
+              "ballon",
+              "buts"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2025-11-05",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J10",
+        "nom": "Tennis-ballon",
+        "description": "Deux équipes séparées par une ligne ou un filet, échanges avec ballon de foot sans qu’il tombe plus d’une fois.",
+        "materiel": [
+          "plots ou filet bas",
+          "ballon"
+        ]
+      },
+      "entrainement": {
+        "id": "E10",
+        "nom": "Agilité plots/haies",
+        "description": "Petits sauts rapides et changements de direction pour développer l’agilité.",
+        "materiel": [
+          "plots",
+          "petites haies"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E10",
+            "nom": "Agilité plots/haies",
+            "description": "Petits sauts rapides et changements de direction pour développer l’agilité.",
+            "materiel": [
+              "plots",
+              "petites haies"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J10",
+            "nom": "Tennis-ballon",
+            "description": "Deux équipes séparées par une ligne ou un filet, échanges avec ballon de foot sans qu’il tombe plus d’une fois.",
+            "materiel": [
+              "plots ou filet bas",
+              "ballon"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2025-11-12",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J01",
+        "nom": "Rondo 4v2",
+        "description": "Conservation de balle en supériorité numérique, avec pression des deux défenseurs au centre.",
+        "materiel": [
+          "plots pour le carré",
+          "ballon"
+        ]
+      },
+      "entrainement": {
+        "id": "E01",
+        "nom": "Slalom conduite de balle",
+        "description": "Dribbles rapides entre plots pour travailler la maîtrise et la vitesse.",
+        "materiel": [
+          "plots",
+          "ballon"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E01",
+            "nom": "Slalom conduite de balle",
+            "description": "Dribbles rapides entre plots pour travailler la maîtrise et la vitesse.",
+            "materiel": [
+              "plots",
+              "ballon"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J01",
+            "nom": "Rondo 4v2",
+            "description": "Conservation de balle en supériorité numérique, avec pression des deux défenseurs au centre.",
+            "materiel": [
+              "plots pour le carré",
+              "ballon"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2025-11-19",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J02",
+        "nom": "Jeu des 4 buts",
+        "description": "Deux équipes s’affrontent avec 4 petits buts disposés aux coins. Objectif : marquer dans n’importe quel but",
+        "materiel": [
+          "4 mini-buts",
+          "plots",
+          "ballon"
+        ]
+      },
+      "entrainement": {
+        "id": "E02",
+        "nom": "Feintes et changements de direction",
+        "description": "Réaliser différentes feintes avant de changer de direction avec le ballon.",
+        "materiel": [
+          "plots",
+          "ballon"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E02",
+            "nom": "Feintes et changements de direction",
+            "description": "Réaliser différentes feintes avant de changer de direction avec le ballon.",
+            "materiel": [
+              "plots",
+              "ballon"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J02",
+            "nom": "Jeu des 4 buts",
+            "description": "Deux équipes s’affrontent avec 4 petits buts disposés aux coins. Objectif : marquer dans n’importe quel but",
+            "materiel": [
+              "4 mini-buts",
+              "plots",
+              "ballon"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2025-11-26",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J03",
+        "nom": "Possession 5 passes",
+        "description": "Marquer un point à chaque série de 5 passes consécutives réussies.",
+        "materiel": [
+          "plots pour délimiter la zone",
+          "ballon"
+        ]
+      },
+      "entrainement": {
+        "id": "E03",
+        "nom": "Contrôle orienté + passe",
+        "description": "Recevoir le ballon, l’orienter vers l’espace libre et enchaîner une passe précise.",
+        "materiel": [
+          "ballon",
+          "plots"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E03",
+            "nom": "Contrôle orienté + passe",
+            "description": "Recevoir le ballon, l’orienter vers l’espace libre et enchaîner une passe précise.",
+            "materiel": [
+              "ballon",
+              "plots"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J03",
+            "nom": "Possession 5 passes",
+            "description": "Marquer un point à chaque série de 5 passes consécutives réussies.",
+            "materiel": [
+              "plots pour délimiter la zone",
+              "ballon"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2025-12-03",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J04",
+        "nom": "Match à thème: 2 touches",
+        "description": "Match classique mais chaque joueur est limité à 2 touches de balle.",
+        "materiel": [
+          "buts",
+          "ballon",
+          "chasubles"
+        ]
+      },
+      "entrainement": {
+        "id": "E04",
+        "nom": "Maîtrise pied faible",
+        "description": "Séries de passes et frappes uniquement avec le pied le moins dominant.",
+        "materiel": [
+          "ballon",
+          "buts",
+          "plots"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E04",
+            "nom": "Maîtrise pied faible",
+            "description": "Séries de passes et frappes uniquement avec le pied le moins dominant.",
+            "materiel": [
+              "ballon",
+              "buts",
+              "plots"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J04",
+            "nom": "Match à thème: 2 touches",
+            "description": "Match classique mais chaque joueur est limité à 2 touches de balle.",
+            "materiel": [
+              "buts",
+              "ballon",
+              "chasubles"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2025-12-10",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J05",
+        "nom": "Relais passe-tir",
+        "description": "Par équipes, enchaîner passe, contrôle et tir au but le plus rapidement possible.",
+        "materiel": [
+          "plots",
+          "ballon",
+          "buts"
+        ]
+      },
+      "entrainement": {
+        "id": "E05",
+        "nom": "Jonglerie objectifs",
+        "description": "Enchaîner un nombre défini de jongles, éventuellement avec alternance pied droit/gauche.",
+        "materiel": [
+          "ballon"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E05",
+            "nom": "Jonglerie objectifs",
+            "description": "Enchaîner un nombre défini de jongles, éventuellement avec alternance pied droit/gauche.",
+            "materiel": [
+              "ballon"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J05",
+            "nom": "Relais passe-tir",
+            "description": "Par équipes, enchaîner passe, contrôle et tir au but le plus rapidement possible.",
+            "materiel": [
+              "plots",
+              "ballon",
+              "buts"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2025-12-17",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J06",
+        "nom": "Conservation en losange",
+        "description": "Jeu de possession avec 4 appuis extérieurs et 2-3 joueurs au milieu pour garder le ballon.",
+        "materiel": [
+          "plots pour le losange",
+          "ballon"
+        ]
+      },
+      "entrainement": {
+        "id": "E06",
+        "nom": "Finition rapide",
+        "description": "Recevoir une passe et frapper immédiatement au but.",
+        "materiel": [
+          "ballon",
+          "buts"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E06",
+            "nom": "Finition rapide",
+            "description": "Recevoir une passe et frapper immédiatement au but.",
+            "materiel": [
+              "ballon",
+              "buts"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J06",
+            "nom": "Conservation en losange",
+            "description": "Jeu de possession avec 4 appuis extérieurs et 2-3 joueurs au milieu pour garder le ballon.",
+            "materiel": [
+              "plots pour le losange",
+              "ballon"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2025-12-24",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J07",
+        "nom": "3 zones progression",
+        "description": "Terrrain divisé en 3 zones, l’équipe doit progresser avec passes successives pour atteindre le but.",
+        "materiel": [
+          "plots",
+          "ballon",
+          "buts"
+        ]
+      },
+      "entrainement": {
+        "id": "E07",
+        "nom": "Passes longues précision",
+        "description": "Travailler la précision des passes longues entre deux zones.",
+        "materiel": [
+          "plots pour les zones",
+          "ballon"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E07",
+            "nom": "Passes longues précision",
+            "description": "Travailler la précision des passes longues entre deux zones.",
+            "materiel": [
+              "plots pour les zones",
+              "ballon"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J07",
+            "nom": "3 zones progression",
+            "description": "Terrrain divisé en 3 zones, l’équipe doit progresser avec passes successives pour atteindre le but.",
+            "materiel": [
+              "plots",
+              "ballon",
+              "buts"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2025-12-31",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J08",
+        "nom": "Contre-attaque 3v2",
+        "description": "Lancement d’attaques rapides en supériorité numérique contre deux défenseurs.",
+        "materiel": [
+          "ballon",
+          "buts",
+          "plots"
+        ]
+      },
+      "entrainement": {
+        "id": "E08",
+        "nom": "Dribbles 1v1 couloir",
+        "description": "Duel attaquant/défenseur dans un couloir étroit, objectif : éliminer ou défendre.",
+        "materiel": [
+          "plots",
+          "ballon"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E08",
+            "nom": "Dribbles 1v1 couloir",
+            "description": "Duel attaquant/défenseur dans un couloir étroit, objectif : éliminer ou défendre.",
+            "materiel": [
+              "plots",
+              "ballon"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J08",
+            "nom": "Contre-attaque 3v2",
+            "description": "Lancement d’attaques rapides en supériorité numérique contre deux défenseurs.",
+            "materiel": [
+              "ballon",
+              "buts",
+              "plots"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2026-01-07",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J09",
+        "nom": "Jeu du chiffre",
+        "description": "Chaque joueur a un numéro ; quand son numéro est appelé, il entre pour un duel 1v1 ou 2v2.",
+        "materiel": [
+          "plots",
+          "ballon",
+          "buts"
+        ]
+      },
+      "entrainement": {
+        "id": "E09",
+        "nom": "Coordination échelles",
+        "description": "Exercices d’appuis rapides avec une échelle de rythme au sol.",
+        "materiel": [
+          "échelle de rythme"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E09",
+            "nom": "Coordination échelles",
+            "description": "Exercices d’appuis rapides avec une échelle de rythme au sol.",
+            "materiel": [
+              "échelle de rythme"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J09",
+            "nom": "Jeu du chiffre",
+            "description": "Chaque joueur a un numéro ; quand son numéro est appelé, il entre pour un duel 1v1 ou 2v2.",
+            "materiel": [
+              "plots",
+              "ballon",
+              "buts"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2026-01-14",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J10",
+        "nom": "Tennis-ballon",
+        "description": "Deux équipes séparées par une ligne ou un filet, échanges avec ballon de foot sans qu’il tombe plus d’une fois.",
+        "materiel": [
+          "plots ou filet bas",
+          "ballon"
+        ]
+      },
+      "entrainement": {
+        "id": "E10",
+        "nom": "Agilité plots/haies",
+        "description": "Petits sauts rapides et changements de direction pour développer l’agilité.",
+        "materiel": [
+          "plots",
+          "petites haies"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E10",
+            "nom": "Agilité plots/haies",
+            "description": "Petits sauts rapides et changements de direction pour développer l’agilité.",
+            "materiel": [
+              "plots",
+              "petites haies"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J10",
+            "nom": "Tennis-ballon",
+            "description": "Deux équipes séparées par une ligne ou un filet, échanges avec ballon de foot sans qu’il tombe plus d’une fois.",
+            "materiel": [
+              "plots ou filet bas",
+              "ballon"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2026-01-21",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J01",
+        "nom": "Rondo 4v2",
+        "description": "Conservation de balle en supériorité numérique, avec pression des deux défenseurs au centre.",
+        "materiel": [
+          "plots pour le carré",
+          "ballon"
+        ]
+      },
+      "entrainement": {
+        "id": "E01",
+        "nom": "Slalom conduite de balle",
+        "description": "Dribbles rapides entre plots pour travailler la maîtrise et la vitesse.",
+        "materiel": [
+          "plots",
+          "ballon"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E01",
+            "nom": "Slalom conduite de balle",
+            "description": "Dribbles rapides entre plots pour travailler la maîtrise et la vitesse.",
+            "materiel": [
+              "plots",
+              "ballon"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J01",
+            "nom": "Rondo 4v2",
+            "description": "Conservation de balle en supériorité numérique, avec pression des deux défenseurs au centre.",
+            "materiel": [
+              "plots pour le carré",
+              "ballon"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2026-01-28",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J02",
+        "nom": "Jeu des 4 buts",
+        "description": "Deux équipes s’affrontent avec 4 petits buts disposés aux coins. Objectif : marquer dans n’importe quel but",
+        "materiel": [
+          "4 mini-buts",
+          "plots",
+          "ballon"
+        ]
+      },
+      "entrainement": {
+        "id": "E02",
+        "nom": "Feintes et changements de direction",
+        "description": "Réaliser différentes feintes avant de changer de direction avec le ballon.",
+        "materiel": [
+          "plots",
+          "ballon"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E02",
+            "nom": "Feintes et changements de direction",
+            "description": "Réaliser différentes feintes avant de changer de direction avec le ballon.",
+            "materiel": [
+              "plots",
+              "ballon"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J02",
+            "nom": "Jeu des 4 buts",
+            "description": "Deux équipes s’affrontent avec 4 petits buts disposés aux coins. Objectif : marquer dans n’importe quel but",
+            "materiel": [
+              "4 mini-buts",
+              "plots",
+              "ballon"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2026-02-04",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J03",
+        "nom": "Possession 5 passes",
+        "description": "Marquer un point à chaque série de 5 passes consécutives réussies.",
+        "materiel": [
+          "plots pour délimiter la zone",
+          "ballon"
+        ]
+      },
+      "entrainement": {
+        "id": "E03",
+        "nom": "Contrôle orienté + passe",
+        "description": "Recevoir le ballon, l’orienter vers l’espace libre et enchaîner une passe précise.",
+        "materiel": [
+          "ballon",
+          "plots"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E03",
+            "nom": "Contrôle orienté + passe",
+            "description": "Recevoir le ballon, l’orienter vers l’espace libre et enchaîner une passe précise.",
+            "materiel": [
+              "ballon",
+              "plots"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J03",
+            "nom": "Possession 5 passes",
+            "description": "Marquer un point à chaque série de 5 passes consécutives réussies.",
+            "materiel": [
+              "plots pour délimiter la zone",
+              "ballon"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2026-02-11",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J04",
+        "nom": "Match à thème: 2 touches",
+        "description": "Match classique mais chaque joueur est limité à 2 touches de balle.",
+        "materiel": [
+          "buts",
+          "ballon",
+          "chasubles"
+        ]
+      },
+      "entrainement": {
+        "id": "E04",
+        "nom": "Maîtrise pied faible",
+        "description": "Séries de passes et frappes uniquement avec le pied le moins dominant.",
+        "materiel": [
+          "ballon",
+          "buts",
+          "plots"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E04",
+            "nom": "Maîtrise pied faible",
+            "description": "Séries de passes et frappes uniquement avec le pied le moins dominant.",
+            "materiel": [
+              "ballon",
+              "buts",
+              "plots"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J04",
+            "nom": "Match à thème: 2 touches",
+            "description": "Match classique mais chaque joueur est limité à 2 touches de balle.",
+            "materiel": [
+              "buts",
+              "ballon",
+              "chasubles"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2026-02-18",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J05",
+        "nom": "Relais passe-tir",
+        "description": "Par équipes, enchaîner passe, contrôle et tir au but le plus rapidement possible.",
+        "materiel": [
+          "plots",
+          "ballon",
+          "buts"
+        ]
+      },
+      "entrainement": {
+        "id": "E05",
+        "nom": "Jonglerie objectifs",
+        "description": "Enchaîner un nombre défini de jongles, éventuellement avec alternance pied droit/gauche.",
+        "materiel": [
+          "ballon"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E05",
+            "nom": "Jonglerie objectifs",
+            "description": "Enchaîner un nombre défini de jongles, éventuellement avec alternance pied droit/gauche.",
+            "materiel": [
+              "ballon"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J05",
+            "nom": "Relais passe-tir",
+            "description": "Par équipes, enchaîner passe, contrôle et tir au but le plus rapidement possible.",
+            "materiel": [
+              "plots",
+              "ballon",
+              "buts"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2026-02-25",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J06",
+        "nom": "Conservation en losange",
+        "description": "Jeu de possession avec 4 appuis extérieurs et 2-3 joueurs au milieu pour garder le ballon.",
+        "materiel": [
+          "plots pour le losange",
+          "ballon"
+        ]
+      },
+      "entrainement": {
+        "id": "E06",
+        "nom": "Finition rapide",
+        "description": "Recevoir une passe et frapper immédiatement au but.",
+        "materiel": [
+          "ballon",
+          "buts"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E06",
+            "nom": "Finition rapide",
+            "description": "Recevoir une passe et frapper immédiatement au but.",
+            "materiel": [
+              "ballon",
+              "buts"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J06",
+            "nom": "Conservation en losange",
+            "description": "Jeu de possession avec 4 appuis extérieurs et 2-3 joueurs au milieu pour garder le ballon.",
+            "materiel": [
+              "plots pour le losange",
+              "ballon"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2026-03-04",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J07",
+        "nom": "3 zones progression",
+        "description": "Terrrain divisé en 3 zones, l’équipe doit progresser avec passes successives pour atteindre le but.",
+        "materiel": [
+          "plots",
+          "ballon",
+          "buts"
+        ]
+      },
+      "entrainement": {
+        "id": "E07",
+        "nom": "Passes longues précision",
+        "description": "Travailler la précision des passes longues entre deux zones.",
+        "materiel": [
+          "plots pour les zones",
+          "ballon"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E07",
+            "nom": "Passes longues précision",
+            "description": "Travailler la précision des passes longues entre deux zones.",
+            "materiel": [
+              "plots pour les zones",
+              "ballon"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J07",
+            "nom": "3 zones progression",
+            "description": "Terrrain divisé en 3 zones, l’équipe doit progresser avec passes successives pour atteindre le but.",
+            "materiel": [
+              "plots",
+              "ballon",
+              "buts"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2026-03-11",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J08",
+        "nom": "Contre-attaque 3v2",
+        "description": "Lancement d’attaques rapides en supériorité numérique contre deux défenseurs.",
+        "materiel": [
+          "ballon",
+          "buts",
+          "plots"
+        ]
+      },
+      "entrainement": {
+        "id": "E08",
+        "nom": "Dribbles 1v1 couloir",
+        "description": "Duel attaquant/défenseur dans un couloir étroit, objectif : éliminer ou défendre.",
+        "materiel": [
+          "plots",
+          "ballon"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E08",
+            "nom": "Dribbles 1v1 couloir",
+            "description": "Duel attaquant/défenseur dans un couloir étroit, objectif : éliminer ou défendre.",
+            "materiel": [
+              "plots",
+              "ballon"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J08",
+            "nom": "Contre-attaque 3v2",
+            "description": "Lancement d’attaques rapides en supériorité numérique contre deux défenseurs.",
+            "materiel": [
+              "ballon",
+              "buts",
+              "plots"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2026-03-18",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J09",
+        "nom": "Jeu du chiffre",
+        "description": "Chaque joueur a un numéro ; quand son numéro est appelé, il entre pour un duel 1v1 ou 2v2.",
+        "materiel": [
+          "plots",
+          "ballon",
+          "buts"
+        ]
+      },
+      "entrainement": {
+        "id": "E09",
+        "nom": "Coordination échelles",
+        "description": "Exercices d’appuis rapides avec une échelle de rythme au sol.",
+        "materiel": [
+          "échelle de rythme"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E09",
+            "nom": "Coordination échelles",
+            "description": "Exercices d’appuis rapides avec une échelle de rythme au sol.",
+            "materiel": [
+              "échelle de rythme"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J09",
+            "nom": "Jeu du chiffre",
+            "description": "Chaque joueur a un numéro ; quand son numéro est appelé, il entre pour un duel 1v1 ou 2v2.",
+            "materiel": [
+              "plots",
+              "ballon",
+              "buts"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2026-03-25",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J10",
+        "nom": "Tennis-ballon",
+        "description": "Deux équipes séparées par une ligne ou un filet, échanges avec ballon de foot sans qu’il tombe plus d’une fois.",
+        "materiel": [
+          "plots ou filet bas",
+          "ballon"
+        ]
+      },
+      "entrainement": {
+        "id": "E10",
+        "nom": "Agilité plots/haies",
+        "description": "Petits sauts rapides et changements de direction pour développer l’agilité.",
+        "materiel": [
+          "plots",
+          "petites haies"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E10",
+            "nom": "Agilité plots/haies",
+            "description": "Petits sauts rapides et changements de direction pour développer l’agilité.",
+            "materiel": [
+              "plots",
+              "petites haies"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J10",
+            "nom": "Tennis-ballon",
+            "description": "Deux équipes séparées par une ligne ou un filet, échanges avec ballon de foot sans qu’il tombe plus d’une fois.",
+            "materiel": [
+              "plots ou filet bas",
+              "ballon"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2026-04-01",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J01",
+        "nom": "Rondo 4v2",
+        "description": "Conservation de balle en supériorité numérique, avec pression des deux défenseurs au centre.",
+        "materiel": [
+          "plots pour le carré",
+          "ballon"
+        ]
+      },
+      "entrainement": {
+        "id": "E01",
+        "nom": "Slalom conduite de balle",
+        "description": "Dribbles rapides entre plots pour travailler la maîtrise et la vitesse.",
+        "materiel": [
+          "plots",
+          "ballon"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E01",
+            "nom": "Slalom conduite de balle",
+            "description": "Dribbles rapides entre plots pour travailler la maîtrise et la vitesse.",
+            "materiel": [
+              "plots",
+              "ballon"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J01",
+            "nom": "Rondo 4v2",
+            "description": "Conservation de balle en supériorité numérique, avec pression des deux défenseurs au centre.",
+            "materiel": [
+              "plots pour le carré",
+              "ballon"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2026-04-08",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J02",
+        "nom": "Jeu des 4 buts",
+        "description": "Deux équipes s’affrontent avec 4 petits buts disposés aux coins. Objectif : marquer dans n’importe quel but",
+        "materiel": [
+          "4 mini-buts",
+          "plots",
+          "ballon"
+        ]
+      },
+      "entrainement": {
+        "id": "E02",
+        "nom": "Feintes et changements de direction",
+        "description": "Réaliser différentes feintes avant de changer de direction avec le ballon.",
+        "materiel": [
+          "plots",
+          "ballon"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E02",
+            "nom": "Feintes et changements de direction",
+            "description": "Réaliser différentes feintes avant de changer de direction avec le ballon.",
+            "materiel": [
+              "plots",
+              "ballon"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J02",
+            "nom": "Jeu des 4 buts",
+            "description": "Deux équipes s’affrontent avec 4 petits buts disposés aux coins. Objectif : marquer dans n’importe quel but",
+            "materiel": [
+              "4 mini-buts",
+              "plots",
+              "ballon"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2026-04-15",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J03",
+        "nom": "Possession 5 passes",
+        "description": "Marquer un point à chaque série de 5 passes consécutives réussies.",
+        "materiel": [
+          "plots pour délimiter la zone",
+          "ballon"
+        ]
+      },
+      "entrainement": {
+        "id": "E03",
+        "nom": "Contrôle orienté + passe",
+        "description": "Recevoir le ballon, l’orienter vers l’espace libre et enchaîner une passe précise.",
+        "materiel": [
+          "ballon",
+          "plots"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E03",
+            "nom": "Contrôle orienté + passe",
+            "description": "Recevoir le ballon, l’orienter vers l’espace libre et enchaîner une passe précise.",
+            "materiel": [
+              "ballon",
+              "plots"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J03",
+            "nom": "Possession 5 passes",
+            "description": "Marquer un point à chaque série de 5 passes consécutives réussies.",
+            "materiel": [
+              "plots pour délimiter la zone",
+              "ballon"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2026-04-22",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J04",
+        "nom": "Match à thème: 2 touches",
+        "description": "Match classique mais chaque joueur est limité à 2 touches de balle.",
+        "materiel": [
+          "buts",
+          "ballon",
+          "chasubles"
+        ]
+      },
+      "entrainement": {
+        "id": "E04",
+        "nom": "Maîtrise pied faible",
+        "description": "Séries de passes et frappes uniquement avec le pied le moins dominant.",
+        "materiel": [
+          "ballon",
+          "buts",
+          "plots"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E04",
+            "nom": "Maîtrise pied faible",
+            "description": "Séries de passes et frappes uniquement avec le pied le moins dominant.",
+            "materiel": [
+              "ballon",
+              "buts",
+              "plots"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J04",
+            "nom": "Match à thème: 2 touches",
+            "description": "Match classique mais chaque joueur est limité à 2 touches de balle.",
+            "materiel": [
+              "buts",
+              "ballon",
+              "chasubles"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2026-04-29",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J05",
+        "nom": "Relais passe-tir",
+        "description": "Par équipes, enchaîner passe, contrôle et tir au but le plus rapidement possible.",
+        "materiel": [
+          "plots",
+          "ballon",
+          "buts"
+        ]
+      },
+      "entrainement": {
+        "id": "E05",
+        "nom": "Jonglerie objectifs",
+        "description": "Enchaîner un nombre défini de jongles, éventuellement avec alternance pied droit/gauche.",
+        "materiel": [
+          "ballon"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E05",
+            "nom": "Jonglerie objectifs",
+            "description": "Enchaîner un nombre défini de jongles, éventuellement avec alternance pied droit/gauche.",
+            "materiel": [
+              "ballon"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J05",
+            "nom": "Relais passe-tir",
+            "description": "Par équipes, enchaîner passe, contrôle et tir au but le plus rapidement possible.",
+            "materiel": [
+              "plots",
+              "ballon",
+              "buts"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2026-05-06",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J06",
+        "nom": "Conservation en losange",
+        "description": "Jeu de possession avec 4 appuis extérieurs et 2-3 joueurs au milieu pour garder le ballon.",
+        "materiel": [
+          "plots pour le losange",
+          "ballon"
+        ]
+      },
+      "entrainement": {
+        "id": "E06",
+        "nom": "Finition rapide",
+        "description": "Recevoir une passe et frapper immédiatement au but.",
+        "materiel": [
+          "ballon",
+          "buts"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E06",
+            "nom": "Finition rapide",
+            "description": "Recevoir une passe et frapper immédiatement au but.",
+            "materiel": [
+              "ballon",
+              "buts"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J06",
+            "nom": "Conservation en losange",
+            "description": "Jeu de possession avec 4 appuis extérieurs et 2-3 joueurs au milieu pour garder le ballon.",
+            "materiel": [
+              "plots pour le losange",
+              "ballon"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2026-05-13",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J07",
+        "nom": "3 zones progression",
+        "description": "Terrrain divisé en 3 zones, l’équipe doit progresser avec passes successives pour atteindre le but.",
+        "materiel": [
+          "plots",
+          "ballon",
+          "buts"
+        ]
+      },
+      "entrainement": {
+        "id": "E07",
+        "nom": "Passes longues précision",
+        "description": "Travailler la précision des passes longues entre deux zones.",
+        "materiel": [
+          "plots pour les zones",
+          "ballon"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E07",
+            "nom": "Passes longues précision",
+            "description": "Travailler la précision des passes longues entre deux zones.",
+            "materiel": [
+              "plots pour les zones",
+              "ballon"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J07",
+            "nom": "3 zones progression",
+            "description": "Terrrain divisé en 3 zones, l’équipe doit progresser avec passes successives pour atteindre le but.",
+            "materiel": [
+              "plots",
+              "ballon",
+              "buts"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2026-05-20",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J08",
+        "nom": "Contre-attaque 3v2",
+        "description": "Lancement d’attaques rapides en supériorité numérique contre deux défenseurs.",
+        "materiel": [
+          "ballon",
+          "buts",
+          "plots"
+        ]
+      },
+      "entrainement": {
+        "id": "E08",
+        "nom": "Dribbles 1v1 couloir",
+        "description": "Duel attaquant/défenseur dans un couloir étroit, objectif : éliminer ou défendre.",
+        "materiel": [
+          "plots",
+          "ballon"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E08",
+            "nom": "Dribbles 1v1 couloir",
+            "description": "Duel attaquant/défenseur dans un couloir étroit, objectif : éliminer ou défendre.",
+            "materiel": [
+              "plots",
+              "ballon"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J08",
+            "nom": "Contre-attaque 3v2",
+            "description": "Lancement d’attaques rapides en supériorité numérique contre deux défenseurs.",
+            "materiel": [
+              "ballon",
+              "buts",
+              "plots"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2026-05-27",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J09",
+        "nom": "Jeu du chiffre",
+        "description": "Chaque joueur a un numéro ; quand son numéro est appelé, il entre pour un duel 1v1 ou 2v2.",
+        "materiel": [
+          "plots",
+          "ballon",
+          "buts"
+        ]
+      },
+      "entrainement": {
+        "id": "E09",
+        "nom": "Coordination échelles",
+        "description": "Exercices d’appuis rapides avec une échelle de rythme au sol.",
+        "materiel": [
+          "échelle de rythme"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E09",
+            "nom": "Coordination échelles",
+            "description": "Exercices d’appuis rapides avec une échelle de rythme au sol.",
+            "materiel": [
+              "échelle de rythme"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J09",
+            "nom": "Jeu du chiffre",
+            "description": "Chaque joueur a un numéro ; quand son numéro est appelé, il entre pour un duel 1v1 ou 2v2.",
+            "materiel": [
+              "plots",
+              "ballon",
+              "buts"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2026-06-03",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J10",
+        "nom": "Tennis-ballon",
+        "description": "Deux équipes séparées par une ligne ou un filet, échanges avec ballon de foot sans qu’il tombe plus d’une fois.",
+        "materiel": [
+          "plots ou filet bas",
+          "ballon"
+        ]
+      },
+      "entrainement": {
+        "id": "E10",
+        "nom": "Agilité plots/haies",
+        "description": "Petits sauts rapides et changements de direction pour développer l’agilité.",
+        "materiel": [
+          "plots",
+          "petites haies"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E10",
+            "nom": "Agilité plots/haies",
+            "description": "Petits sauts rapides et changements de direction pour développer l’agilité.",
+            "materiel": [
+              "plots",
+              "petites haies"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J10",
+            "nom": "Tennis-ballon",
+            "description": "Deux équipes séparées par une ligne ou un filet, échanges avec ballon de foot sans qu’il tombe plus d’une fois.",
+            "materiel": [
+              "plots ou filet bas",
+              "ballon"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2026-06-10",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J01",
+        "nom": "Rondo 4v2",
+        "description": "Conservation de balle en supériorité numérique, avec pression des deux défenseurs au centre.",
+        "materiel": [
+          "plots pour le carré",
+          "ballon"
+        ]
+      },
+      "entrainement": {
+        "id": "E01",
+        "nom": "Slalom conduite de balle",
+        "description": "Dribbles rapides entre plots pour travailler la maîtrise et la vitesse.",
+        "materiel": [
+          "plots",
+          "ballon"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E01",
+            "nom": "Slalom conduite de balle",
+            "description": "Dribbles rapides entre plots pour travailler la maîtrise et la vitesse.",
+            "materiel": [
+              "plots",
+              "ballon"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J01",
+            "nom": "Rondo 4v2",
+            "description": "Conservation de balle en supériorité numérique, avec pression des deux défenseurs au centre.",
+            "materiel": [
+              "plots pour le carré",
+              "ballon"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2026-06-17",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J02",
+        "nom": "Jeu des 4 buts",
+        "description": "Deux équipes s’affrontent avec 4 petits buts disposés aux coins. Objectif : marquer dans n’importe quel but",
+        "materiel": [
+          "4 mini-buts",
+          "plots",
+          "ballon"
+        ]
+      },
+      "entrainement": {
+        "id": "E02",
+        "nom": "Feintes et changements de direction",
+        "description": "Réaliser différentes feintes avant de changer de direction avec le ballon.",
+        "materiel": [
+          "plots",
+          "ballon"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E02",
+            "nom": "Feintes et changements de direction",
+            "description": "Réaliser différentes feintes avant de changer de direction avec le ballon.",
+            "materiel": [
+              "plots",
+              "ballon"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J02",
+            "nom": "Jeu des 4 buts",
+            "description": "Deux équipes s’affrontent avec 4 petits buts disposés aux coins. Objectif : marquer dans n’importe quel but",
+            "materiel": [
+              "4 mini-buts",
+              "plots",
+              "ballon"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2026-06-24",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J03",
+        "nom": "Possession 5 passes",
+        "description": "Marquer un point à chaque série de 5 passes consécutives réussies.",
+        "materiel": [
+          "plots pour délimiter la zone",
+          "ballon"
+        ]
+      },
+      "entrainement": {
+        "id": "E03",
+        "nom": "Contrôle orienté + passe",
+        "description": "Recevoir le ballon, l’orienter vers l’espace libre et enchaîner une passe précise.",
+        "materiel": [
+          "ballon",
+          "plots"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E03",
+            "nom": "Contrôle orienté + passe",
+            "description": "Recevoir le ballon, l’orienter vers l’espace libre et enchaîner une passe précise.",
+            "materiel": [
+              "ballon",
+              "plots"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J03",
+            "nom": "Possession 5 passes",
+            "description": "Marquer un point à chaque série de 5 passes consécutives réussies.",
+            "materiel": [
+              "plots pour délimiter la zone",
+              "ballon"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    },
+    {
+      "date": "2026-07-01",
+      "totalMinutes": 65,
+      "jeu": {
+        "id": "J04",
+        "nom": "Match à thème: 2 touches",
+        "description": "Match classique mais chaque joueur est limité à 2 touches de balle.",
+        "materiel": [
+          "buts",
+          "ballon",
+          "chasubles"
+        ]
+      },
+      "entrainement": {
+        "id": "E04",
+        "nom": "Maîtrise pied faible",
+        "description": "Séries de passes et frappes uniquement avec le pied le moins dominant.",
+        "materiel": [
+          "ballon",
+          "buts",
+          "plots"
+        ]
+      },
+      "plan": [
+        {
+          "type": "echauffement",
+          "label": "Échauffement",
+          "minutes": 10,
+          "details": {
+            "description": "Activation générale + mobilité"
+          },
+          "startMin": 0,
+          "endMin": 10
+        },
+        {
+          "type": "individuel",
+          "label": "Entrainement individuel",
+          "minutes": 15,
+          "details": {
+            "id": "E04",
+            "nom": "Maîtrise pied faible",
+            "description": "Séries de passes et frappes uniquement avec le pied le moins dominant.",
+            "materiel": [
+              "ballon",
+              "buts",
+              "plots"
+            ]
+          },
+          "startMin": 10,
+          "endMin": 25
+        },
+        {
+          "type": "jeu",
+          "label": "Jeu collectif",
+          "minutes": 15,
+          "details": {
+            "id": "J04",
+            "nom": "Match à thème: 2 touches",
+            "description": "Match classique mais chaque joueur est limité à 2 touches de balle.",
+            "materiel": [
+              "buts",
+              "ballon",
+              "chasubles"
+            ]
+          },
+          "startMin": 25,
+          "endMin": 40
+        },
+        {
+          "type": "tactique",
+          "label": "Tactique",
+          "minutes": 5,
+          "details": {
+            "description": "Principe du jour (placement, pressing, relance courte)",
+            "materiel": []
+          },
+          "startMin": 40,
+          "endMin": 45
+        },
+        {
+          "type": "match_assiste",
+          "label": "Match assisté",
+          "minutes": 10,
+          "details": {
+            "description": "Coaching direct sur consignes du jour",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 45,
+          "endMin": 55
+        },
+        {
+          "type": "match",
+          "label": "Match",
+          "minutes": 10,
+          "details": {
+            "description": "Jeu libre pour ancrer les automatismes",
+            "materiel": [
+              "buts",
+              "chasubles",
+              "ballon"
+            ]
+          },
+          "startMin": 55,
+          "endMin": 65
+        }
+      ]
+    }
+  ]
+}
