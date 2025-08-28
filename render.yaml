@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: entrainement-foot
+    env: node
+    plan: free                      # plan gratuit
+    region: frankfurt               # proche de la France
+    buildCommand: "npm install"
+    startCommand: "npm start"
+    autoDeploy: true
+
+    # On monte un disque persistant sur /opt/render/project/src/data
+    disk:
+      name: data-disk
+      mountPath: /opt/render/project/src/data
+      sizeGB: 1                     # largement suffisant
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Optionnel : protège les endpoints POST avec un token simple
+      # - key: EDIT_TOKEN
+      #   generateValue: true
