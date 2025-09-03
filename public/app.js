@@ -487,11 +487,14 @@ function initPlanningModes(calendarRef, catalogRef, rerenderAll) {
   const input = document.getElementById("day-input");
   const btnToday = document.getElementById("day-today");
 
-  let currentMode = "list";
-  let selectedDate = null;
+  // --- Récupère préférences utilisateur ---
+  let currentMode = localStorage.getItem("planningMode") || "day"; // <-- JOUR par défaut
+  let selectedDate = localStorage.getItem("planningSelectedDate") || null;
 
   function setMode(mode) {
     currentMode = mode;
+    localStorage.setItem("planningMode", mode); // <-- persiste le mode
+
     btnList.classList.toggle("active", mode === "list");
     btnDay.classList.toggle("active", mode === "day");
     dayControls.style.display = mode === "day" ? "flex" : "none";
@@ -503,8 +506,8 @@ function initPlanningModes(calendarRef, catalogRef, rerenderAll) {
       if (!selectedDate) {
         const next = findNextTraining(calendarRef());
         selectedDate = next ? next.date : (calendarRef().items[0]?.date || todayIso());
-        input.value = selectedDate;
       }
+      input.value = selectedDate;
       renderDayView(calendarRef(), catalogRef(), rerenderAll, selectedDate);
     }
   }
@@ -514,18 +517,24 @@ function initPlanningModes(calendarRef, catalogRef, rerenderAll) {
 
   input.addEventListener("change", () => {
     selectedDate = input.value;
+    localStorage.setItem("planningSelectedDate", selectedDate); // <-- persiste la date choisie
     if (selectedDate) renderDayView(calendarRef(), catalogRef(), rerenderAll, selectedDate);
   });
 
   btnToday.addEventListener("click", () => {
     const next = findNextTraining(calendarRef());
     selectedDate = next ? next.date : (calendarRef().items[0]?.date || todayIso());
+    localStorage.setItem("planningSelectedDate", selectedDate); // <-- persiste aussi ce choix
     input.value = selectedDate;
     renderDayView(calendarRef(), catalogRef(), rerenderAll, selectedDate);
   });
 
+  // Initialise directement avec le mode mémorisé (par défaut: "day")
+  setMode(currentMode);
+
   return {
     refreshOnCalendarChange() {
+      // Si la vue Jour est active, on re-render ce jour (utile après un changement)
       if (currentMode === "day" && selectedDate) {
         renderDayView(calendarRef(), catalogRef(), rerenderAll, selectedDate);
       }
