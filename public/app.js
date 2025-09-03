@@ -6,9 +6,19 @@ function initTabs() {
     tabs.forEach(t => t.classList.toggle("active", t.dataset.target === id));
     views.forEach(v => v.classList.toggle("active", v.id === id));
     document.getElementById("fab-menu").classList.remove("show");
-    updateFabVisibility(); // ← ajoute ceci
+    updateFabVisibility();
   }
   tabs.forEach(t => t.addEventListener("click", () => activate(t.dataset.target)));
+}
+
+// FAB visibility: only show on list tabs (jeux/entrainements)
+function updateFabVisibility() {
+  const activeId = document.querySelector(".view.active")?.id;
+  const fab = document.getElementById("fab");
+  const menu = document.getElementById("fab-menu");
+  const show = activeId === "view-jeux" || activeId === "view-entrainements";
+  if (!show) menu.classList.remove("show");
+  fab.style.display = show ? "flex" : "none";
 }
 
 // ---- Helpers ----
@@ -45,15 +55,18 @@ function countUsages(calendar) {
   return counts;
 }
 
-// ---- Planning (choix par jour) ----
-function makeChooseButton(label, onClick) {
-  const btn = document.createElement("button");
-  btn.className = "btn";
-  btn.textContent = label;
-  btn.addEventListener("click", onClick);
-  return btn;
+async function updateDay(date, payload) {
+  const res = await fetch(`/api/day/${date}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+  const data = await res.json();
+  if (!res.ok || !data.ok) throw new Error(data.error || "Erreur serveur");
+  return data.calendar;
 }
 
+// ---- Planning (liste) ----
 function renderPlanning(calendar, catalog, rerenderAll) {
   const stack = document.getElementById("stack");
   stack.innerHTML = "";
@@ -61,162 +74,165 @@ function renderPlanning(calendar, catalog, rerenderAll) {
   const usages = countUsages(calendar);
 
   calendar.items.forEach((it) => {
-    const card = document.createElement("div");
-    card.className = "card";
-
-    // --- Bandeau annulation + contrôles ---
-    const cancelBar = document.createElement("div");
-    const cancelControls = document.createElement("div");
-    cancelControls.className = "typebar";
-    const cancelSelect = document.createElement("select");
-    ["", "climat", "absence", "vacances"].forEach(v => {
-      const opt = document.createElement("option");
-      opt.value = v; opt.textContent = v ? `Raison: ${v}` : "Raison…";
-      cancelSelect.appendChild(opt);
-    });
-    cancelSelect.value = it.cancelled?.reason || "";
-
-    const cancelBtn = document.createElement("button");
-    cancelBtn.className = "btn";
-    cancelBtn.textContent = it.cancelled?.is ? "Retirer l'annulation" : "Annuler cette séance";
-
-    cancelBtn.addEventListener("click", async () => {
-      try {
-        const nextIs = !it.cancelled?.is;
-        const reason = nextIs ? (cancelSelect.value || "climat") : null;
-        const cal = await updateDay(it.date, { cancelled: { is: nextIs, reason } });
-        rerenderAll(cal);
-      } catch (e) { alert(e.message || e); }
-    });
-
-    cancelControls.appendChild(cancelBtn);
-    cancelControls.appendChild(cancelSelect);
-    if (it.cancelled?.is) {
-      const cancelBadge = document.createElement("div");
-      cancelBadge.className = "cancel";
-      cancelBadge.textContent = `Séance annulée (${it.cancelled.reason})`;
-      card.appendChild(cancelBadge);
-    }
-    card.appendChild(cancelControls);
-
-    // --- Date ---
-    const dateEl = document.createElement("div");
-    dateEl.className = "date";
-    dateEl.textContent = toDateLabel(it.date) + (it.weekday === "samedi" ? " • Samedi" : "");
-    card.appendChild(dateEl);
-
-    // --- Spécifique samedi : choix de type + lieu (plateau) ---
-    if (it.weekday === "samedi") {
-      const typeBar = document.createElement("div");
-      typeBar.className = "typebar";
-      const pill = document.createElement("span");
-      pill.className = "pill-type";
-      pill.textContent = `Type: ${it.type}`;
-      typeBar.appendChild(pill);
-
-      ["entrainement", "plateau", "libre"].forEach(t => {
-        const b = document.createElement("button");
-        b.className = "btn";
-        b.textContent = t.charAt(0).toUpperCase() + t.slice(1);
-        b.disabled = it.type === t;
-        b.addEventListener("click", async () => {
-          try {
-            const cal = await updateDay(it.date, { type: t });
-            rerenderAll(cal);
-          } catch (e) { alert(e.message || e); }
-        });
-        typeBar.appendChild(b);
-      });
-
-      // Lieu si plateau
-      if (it.type === "plateau") {
-        const lieuInput = document.createElement("input");
-        lieuInput.className = "lieu-input";
-        lieuInput.placeholder = "Lieu du plateau…";
-        lieuInput.value = it.samedi?.lieu || "";
-        const saveLieu = document.createElement("button");
-        saveLieu.className = "btn";
-        saveLieu.textContent = "Enregistrer le lieu";
-        saveLieu.addEventListener("click", async () => {
-          try {
-            const cal = await updateDay(it.date, { samedi: { lieu: lieuInput.value } });
-            rerenderAll(cal);
-          } catch (e) { alert(e.message || e); }
-        });
-        typeBar.appendChild(lieuInput);
-        typeBar.appendChild(saveLieu);
-      }
-
-      card.appendChild(typeBar);
-    }
-
-    // --- Plan + boutons choisir (si entrainement) ---
-    const planEl = document.createElement("div");
-    planEl.className = "plan";
-
-    it.plan.forEach((s, idx) => {
-      const block = document.createElement("div");
-      block.className = `block t-${s.type}`;
-      const band = document.createElement("div");
-      band.className = "band";
-      block.appendChild(band);
-
-      const h3 = document.createElement("h3");
-      const leftTitle = document.createElement("span");
-      leftTitle.textContent = `${s.label} • ${s.minutes} min`;
-      const rightBtns = document.createElement("span");
-
-      const canChoose = (it.weekday === "mercredi" || (it.weekday === "samedi" && it.type === "entrainement"));
-
-      if (canChoose && s.type === "individuel") {
-        const btn = document.createElement("button");
-        btn.className = "btn";
-        btn.textContent = "Choisir l'entraînement";
-        btn.addEventListener("click", () => openChooser({
-          kind: "entr", date: it.date, catalog, calendar, usages, rerenderAll
-        }));
-        rightBtns.appendChild(btn);
-      }
-      if (canChoose && s.type === "jeu") {
-        const btn = document.createElement("button");
-        btn.className = "btn";
-        btn.textContent = "Choisir le jeu";
-        btn.addEventListener("click", () => openChooser({
-          kind: "jeux", date: it.date, catalog, calendar, usages, rerenderAll
-        }));
-        rightBtns.appendChild(btn);
-      }
-
-      h3.appendChild(leftTitle);
-      h3.appendChild(rightBtns);
-
-      const p = document.createElement("p");
-      if (s.type === "individuel" || s.type === "jeu") {
-        const t = s.details;
-        p.innerHTML = `<strong>${t.nom}</strong> — ${t.description}`;
-      } else {
-        p.textContent = s.details.description;
-      }
-
-      block.appendChild(h3);
-      block.appendChild(p);
-      renderBadges(block, s.details.materiel);
-      planEl.appendChild(block);
-
-      if (idx < it.plan.length - 1) {
-        const pause = document.createElement("div");
-        pause.className = "pause";
-        pause.textContent = "Pause (5 min)";
-        planEl.appendChild(pause);
-      }
-    });
-
-    card.appendChild(planEl);
+    const card = renderDayCard(it, calendar, catalog, usages, rerenderAll);
     stack.appendChild(card);
   });
 }
 
-// ---- Modal chooser ----
+// ---- Rendu d’une carte de jour (réutilisé par vue liste ET vue jour) ----
+function renderDayCard(it, calendar, catalog, usages, rerenderAll) {
+  const card = document.createElement("div");
+  card.className = "card";
+
+  // Annulation
+  const cancelControls = document.createElement("div");
+  cancelControls.className = "typebar";
+  const cancelSelect = document.createElement("select");
+  ["", "climat", "absence", "vacances"].forEach(v => {
+    const opt = document.createElement("option");
+    opt.value = v; opt.textContent = v ? `Raison: ${v}` : "Raison…";
+    cancelSelect.appendChild(opt);
+  });
+  cancelSelect.value = it.cancelled?.reason || "";
+
+  const cancelBtn = document.createElement("button");
+  cancelBtn.className = "btn";
+  cancelBtn.textContent = it.cancelled?.is ? "Retirer l'annulation" : "Annuler cette séance";
+  cancelBtn.addEventListener("click", async () => {
+    try {
+      const nextIs = !it.cancelled?.is;
+      const reason = nextIs ? (cancelSelect.value || "climat") : null;
+      const cal = await updateDay(it.date, { cancelled: { is: nextIs, reason } });
+      rerenderAll(cal);
+    } catch (e) { alert(e.message || e); }
+  });
+
+  cancelControls.appendChild(cancelBtn);
+  cancelControls.appendChild(cancelSelect);
+  if (it.cancelled?.is) {
+    const cancelBadge = document.createElement("div");
+    cancelBadge.className = "cancel";
+    cancelBadge.textContent = `Séance annulée (${it.cancelled.reason})`;
+    card.appendChild(cancelBadge);
+  }
+  card.appendChild(cancelControls);
+
+  // Date
+  const dateEl = document.createElement("div");
+  dateEl.className = "date";
+  dateEl.textContent = toDateLabel(it.date) + (it.weekday === "samedi" ? " • Samedi" : "");
+  card.appendChild(dateEl);
+
+  // Samedi: type & lieu
+  if (it.weekday === "samedi") {
+    const typeBar = document.createElement("div");
+    typeBar.className = "typebar";
+    const pill = document.createElement("span");
+    pill.className = "pill-type";
+    pill.textContent = `Type: ${it.type}`;
+    typeBar.appendChild(pill);
+
+    ["entrainement", "plateau", "libre"].forEach(t => {
+      const b = document.createElement("button");
+      b.className = "btn";
+      b.textContent = t.charAt(0).toUpperCase() + t.slice(1);
+      b.disabled = it.type === t;
+      b.addEventListener("click", async () => {
+        try {
+          const cal = await updateDay(it.date, { type: t });
+          rerenderAll(cal);
+        } catch (e) { alert(e.message || e); }
+      });
+      typeBar.appendChild(b);
+    });
+
+    if (it.type === "plateau") {
+      const lieuInput = document.createElement("input");
+      lieuInput.className = "lieu-input";
+      lieuInput.placeholder = "Lieu du plateau…";
+      lieuInput.value = it.samedi?.lieu || "";
+      const saveLieu = document.createElement("button");
+      saveLieu.className = "btn";
+      saveLieu.textContent = "Enregistrer le lieu";
+      saveLieu.addEventListener("click", async () => {
+        try {
+          const cal = await updateDay(it.date, { samedi: { lieu: lieuInput.value } });
+          rerenderAll(cal);
+        } catch (e) { alert(e.message || e); }
+      });
+      typeBar.appendChild(lieuInput);
+      typeBar.appendChild(saveLieu);
+    }
+
+    card.appendChild(typeBar);
+  }
+
+  // Plan + Choisir jeu/exo si entrainement
+  const planEl = document.createElement("div");
+  planEl.className = "plan";
+
+  it.plan.forEach((s, idx) => {
+    const block = document.createElement("div");
+    block.className = `block t-${s.type}`;
+    const band = document.createElement("div");
+    band.className = "band";
+    block.appendChild(band);
+
+    const h3 = document.createElement("h3");
+    const leftTitle = document.createElement("span");
+    leftTitle.textContent = `${s.label} • ${s.minutes} min`;
+    const rightBtns = document.createElement("span");
+
+    const canChoose = (it.weekday === "mercredi" || (it.weekday === "samedi" && it.type === "entrainement"));
+
+    if (canChoose && s.type === "individuel") {
+      const btn = document.createElement("button");
+      btn.className = "btn";
+      btn.textContent = "Choisir l'entraînement";
+      btn.addEventListener("click", () => openChooser({
+        kind: "entr", date: it.date, catalog, calendar, usages, rerenderAll
+      }));
+      rightBtns.appendChild(btn);
+    }
+    if (canChoose && s.type === "jeu") {
+      const btn = document.createElement("button");
+      btn.className = "btn";
+      btn.textContent = "Choisir le jeu";
+      btn.addEventListener("click", () => openChooser({
+        kind: "jeux", date: it.date, catalog, calendar, usages, rerenderAll
+      }));
+      rightBtns.appendChild(btn);
+    }
+
+    h3.appendChild(leftTitle);
+    h3.appendChild(rightBtns);
+
+    const p = document.createElement("p");
+    if (s.type === "individuel" || s.type === "jeu") {
+      const t = s.details;
+      p.innerHTML = `<strong>${t.nom}</strong> — ${t.description}`;
+    } else {
+      p.textContent = s.details.description;
+    }
+
+    block.appendChild(h3);
+    block.appendChild(p);
+    renderBadges(block, s.details.materiel);
+    planEl.appendChild(block);
+
+    if (idx < it.plan.length - 1) {
+      const pause = document.createElement("div");
+      pause.className = "pause";
+      pause.textContent = "Pause (5 min)";
+      planEl.appendChild(pause);
+    }
+  });
+
+  card.appendChild(planEl);
+  return card;
+}
+
+// ---- Modal chooser (inchangé) ----
 function openChooser({ kind, date, catalog, calendar, usages, rerenderAll }) {
   const modal = document.getElementById("chooser");
   const title = document.getElementById("chooser-title");
@@ -276,12 +292,9 @@ function openChooser({ kind, date, catalog, calendar, usages, rerenderAll }) {
             });
             const data = await res.json();
             if (!res.ok || !data.ok) throw new Error(data.error || "Erreur serveur");
-            // Mettre à jour état local
             rerenderAll(data.calendar);
             modal.classList.remove("show");
-          } catch (e) {
-            alert("Impossible de mettre à jour le jour: " + (e?.message || e));
-          }
+          } catch (e) { alert("Impossible de mettre à jour le jour: " + (e?.message || e)); }
         });
 
         wrap.appendChild(pill);
@@ -299,16 +312,9 @@ function openChooser({ kind, date, catalog, calendar, usages, rerenderAll }) {
   modal.onclick = (e) => { if (e.target === modal) modal.classList.remove("show"); };
 }
 
-// ---------- Catalog (édition par item + compteurs & mise en évidence) ----------
-function csvToArray(s) {
-  return (s || "")
-    .split(",")
-    .map(x => x.trim())
-    .filter(Boolean);
-}
-function arrayToCsv(a) {
-  return (a || []).join(", ");
-}
+// ---------- Catalog (édition par item) ----------
+function csvToArray(s) { return (s || "").split(",").map(x => x.trim()).filter(Boolean); }
+function arrayToCsv(a) { return (a || []).join(", "); }
 function nextId(existing, prefix) {
   let max = 0;
   existing.forEach(it => {
@@ -332,121 +338,52 @@ async function saveCatalog(catalog) {
 }
 
 function makeReadCard(obj, typeLabel, count, onEdit, onDelete) {
-  const wrap = document.createElement("div");
-  wrap.className = "item";
+  const wrap = document.createElement("div"); wrap.className = "item";
   if (!count) wrap.classList.add("unused");
-
   const band = document.createElement("div");
   band.className = `band ${typeLabel.includes("Jeu") ? "t-jeu" : "t-individuel"}`;
   band.style.width = "6px"; band.style.position = "absolute"; band.style.left = "0"; band.style.top = "0"; band.style.bottom = "0";
   wrap.appendChild(band);
 
-  const pill = document.createElement("div");
-  pill.className = "pill";
-  pill.textContent = typeLabel;
-
+  const pill = document.createElement("div"); pill.className = "pill"; pill.textContent = typeLabel;
   const h3 = document.createElement("h3");
-  const left = document.createElement("span");
-  left.textContent = `${obj.nom} (${obj.id})`;
-  const right = document.createElement("span");
-  right.className = "count";
-  right.textContent = `${count || 0} utilisation(s)`;
-  h3.appendChild(left);
-  h3.appendChild(right);
+  const left = document.createElement("span"); left.textContent = `${obj.nom} (${obj.id})`;
+  const right = document.createElement("span"); right.className = "count"; right.textContent = `${count || 0} utilisation(s)`;
+  h3.appendChild(left); h3.appendChild(right);
+  const p = document.createElement("p"); p.textContent = obj.description;
 
-  const p = document.createElement("p");
-  p.textContent = obj.description;
+  const actions = document.createElement("div"); actions.className = "actions";
+  const editBtn = document.createElement("button"); editBtn.className = "btn primary"; editBtn.textContent = "Modifier"; editBtn.addEventListener("click", onEdit);
+  const delBtn = document.createElement("button"); delBtn.className = "btn"; delBtn.textContent = "Supprimer"; delBtn.addEventListener("click", onDelete);
+  actions.appendChild(editBtn); actions.appendChild(delBtn);
 
-  const actions = document.createElement("div");
-  actions.className = "actions";
-
-  const editBtn = document.createElement("button");
-  editBtn.className = "btn primary";
-  editBtn.textContent = "Modifier";
-  editBtn.addEventListener("click", onEdit);
-
-  const delBtn = document.createElement("button");
-  delBtn.className = "btn";
-  delBtn.textContent = "Supprimer";
-  delBtn.addEventListener("click", onDelete);
-
-  actions.appendChild(editBtn);
-  actions.appendChild(delBtn);
-
-  wrap.appendChild(pill);
-  wrap.appendChild(h3);
-  wrap.appendChild(p);
-  renderBadges(wrap, obj.materiel);
-  wrap.appendChild(actions);
-
+  wrap.appendChild(pill); wrap.appendChild(h3); wrap.appendChild(p); renderBadges(wrap, obj.materiel); wrap.appendChild(actions);
   return wrap;
 }
 
 function makeEditCard(obj, typeLabel, onSave, onCancel) {
-  const wrap = document.createElement("div");
-  wrap.className = "item";
-
+  const wrap = document.createElement("div"); wrap.className = "item";
   const band = document.createElement("div");
   band.className = `band ${typeLabel.includes("Jeu") ? "t-jeu" : "t-individuel"}`;
   band.style.width = "6px"; band.style.position = "absolute"; band.style.left = "0"; band.style.top = "0"; band.style.bottom = "0";
   wrap.appendChild(band);
 
-  const pill = document.createElement("div");
-  pill.className = "pill";
-  pill.textContent = `${typeLabel} • édition`;
+  const pill = document.createElement("div"); pill.className = "pill"; pill.textContent = `${typeLabel} • édition`;
 
-  const row = document.createElement("div");
-  row.className = "row";
+  const row = document.createElement("div"); row.className = "row";
+  const idInput = document.createElement("input"); idInput.value = obj.id || ""; idInput.placeholder = "ID (ex: J01 / E01)";
+  const nomInput = document.createElement("input"); nomInput.value = obj.nom || ""; nomInput.placeholder = "Nom";
+  const descInput = document.createElement("textarea"); descInput.value = obj.description || ""; descInput.placeholder = "Description"; descInput.rows = 3;
+  const matInput = document.createElement("input"); matInput.value = arrayToCsv(obj.materiel || []); matInput.placeholder = "Matériel (séparé par des virgules)";
 
-  const idInput = document.createElement("input");
-  idInput.value = obj.id || "";
-  idInput.placeholder = "ID (ex: J01 / E01)";
+  const actions = document.createElement("div"); actions.className = "actions";
+  const saveBtn = document.createElement("button"); saveBtn.className = "btn primary"; saveBtn.textContent = "Enregistrer";
+  saveBtn.addEventListener("click", () => onSave({ id: idInput.value.trim(), nom: nomInput.value.trim(), description: descInput.value.trim(), materiel: csvToArray(matInput.value) }));
+  const cancelBtn = document.createElement("button"); cancelBtn.className = "btn"; cancelBtn.textContent = "Annuler"; cancelBtn.addEventListener("click", onCancel);
+  actions.appendChild(saveBtn); actions.appendChild(cancelBtn);
 
-  const nomInput = document.createElement("input");
-  nomInput.value = obj.nom || "";
-  nomInput.placeholder = "Nom";
-
-  const descInput = document.createElement("textarea");
-  descInput.value = obj.description || "";
-  descInput.placeholder = "Description";
-  descInput.rows = 3;
-
-  const matInput = document.createElement("input");
-  matInput.value = arrayToCsv(obj.materiel || []);
-  matInput.placeholder = "Matériel (séparé par des virgules)";
-
-  const actions = document.createElement("div");
-  actions.className = "actions";
-  const saveBtn = document.createElement("button");
-  saveBtn.className = "btn primary";
-  saveBtn.textContent = "Enregistrer";
-  saveBtn.addEventListener("click", () => {
-    const updated = {
-      id: idInput.value.trim(),
-      nom: nomInput.value.trim(),
-      description: descInput.value.trim(),
-      materiel: csvToArray(matInput.value)
-    };
-    onSave(updated);
-  });
-
-  const cancelBtn = document.createElement("button");
-  cancelBtn.className = "btn";
-  cancelBtn.textContent = "Annuler";
-  cancelBtn.addEventListener("click", onCancel);
-
-  actions.appendChild(saveBtn);
-  actions.appendChild(cancelBtn);
-
-  row.appendChild(idInput);
-  row.appendChild(nomInput);
-  row.appendChild(descInput);
-  row.appendChild(matInput);
-
-  wrap.appendChild(pill);
-  wrap.appendChild(row);
-  wrap.appendChild(actions);
-
+  row.appendChild(idInput); row.appendChild(nomInput); row.appendChild(descInput); row.appendChild(matInput);
+  wrap.appendChild(pill); wrap.appendChild(row); wrap.appendChild(actions);
   return wrap;
 }
 
@@ -459,7 +396,6 @@ function renderEditableGrid(containerId, items, typeLabel, idPrefix, catalogRef,
 
   items.forEach((obj, idx) => {
     let editing = false;
-
     const mount = () => { container.replaceChild(render(), node); };
     const onEdit = () => { editing = true; mount(); };
     const onCancel = () => { editing = false; mount(); };
@@ -468,28 +404,17 @@ function renderEditableGrid(containerId, items, typeLabel, idPrefix, catalogRef,
       if (!updated.id || !updated.nom || !updated.description || !Array.isArray(updated.materiel)) {
         alert("Chaque entrée doit avoir id, nom, description, materiel[]"); return;
       }
-      try {
-        await saveCatalog(catalogRef());
-        rerenderAll(); // re-render lists + planning (compteurs)
-      } catch (e) {
-        alert("Erreur: " + (e?.message || e));
-      }
+      try { await saveCatalog(catalogRef()); rerenderAll(); } catch (e) { alert("Erreur: " + (e?.message || e)); }
     };
     const onDelete = async () => {
       if (!confirm("Supprimer cet item ?")) return;
       items.splice(idx, 1);
-      try {
-        await saveCatalog(catalogRef());
-        rerenderAll();
-      } catch (e) {
-        alert("Erreur: " + (e?.message || e));
-      }
+      try { await saveCatalog(catalogRef()); rerenderAll(); } catch (e) { alert("Erreur: " + (e?.message || e)); }
     };
 
-    const render = () =>
-      editing
-        ? makeEditCard(items[idx], typeLabel, onSave, onCancel)
-        : makeReadCard(items[idx], typeLabel, counts.get(obj.id) || 0, onEdit, onDelete);
+    const render = () => editing
+      ? makeEditCard(items[idx], typeLabel, onSave, onCancel)
+      : makeReadCard(items[idx], typeLabel, counts.get(obj.id) || 0, onEdit, onDelete);
 
     const node = render();
     container.appendChild(node);
@@ -511,6 +436,101 @@ function initFab(getActiveTabId, addJeu, addEntr) {
   });
   addJ.addEventListener("click", () => { addJeu(); menu.classList.remove("show"); });
   addE.addEventListener("click", () => { addEntr(); menu.classList.remove("show"); });
+}
+
+// ---- Vue JOUR : logique ----
+function isTrainingDay(item) {
+  if (item.cancelled?.is) return false;
+  if (item.weekday === "mercredi") return true;
+  if (item.weekday === "samedi") return item.type === "entrainement";
+  return false;
+}
+
+function todayIso() {
+  const now = new Date();
+  const yyyy = now.getUTCFullYear();
+  const mm = String(now.getUTCMonth() + 1).padStart(2, "0");
+  const dd = String(now.getUTCDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function findNextTraining(calendar) {
+  const today = todayIso();
+  return (calendar.items || [])
+    .filter(it => it.date >= today && isTrainingDay(it))
+    .sort((a, b) => a.date.localeCompare(b.date))[0] || null;
+}
+
+function renderDayView(calendar, catalog, rerenderAll, targetDate) {
+  const dayWrap = document.getElementById("day-container");
+  dayWrap.innerHTML = "";
+
+  const item = (calendar.items || []).find(x => x.date === targetDate);
+  if (!item) {
+    const msg = document.createElement("p");
+    msg.textContent = "Aucune séance à cette date.";
+    dayWrap.appendChild(msg);
+    return;
+  }
+  const usages = countUsages(calendar);
+  const card = renderDayCard(item, calendar, catalog, usages, rerenderAll);
+  dayWrap.appendChild(card);
+}
+
+// ---- Mode switch (liste/jour) ----
+function initPlanningModes(calendarRef, catalogRef, rerenderAll) {
+  const btnList = document.getElementById("btn-mode-list");
+  const btnDay = document.getElementById("btn-mode-day");
+  const dayControls = document.getElementById("day-controls");
+  const stack = document.getElementById("stack");
+  const dayContainer = document.getElementById("day-container");
+  const input = document.getElementById("day-input");
+  const btnToday = document.getElementById("day-today");
+
+  let currentMode = "list";
+  let selectedDate = null;
+
+  function setMode(mode) {
+    currentMode = mode;
+    btnList.classList.toggle("active", mode === "list");
+    btnDay.classList.toggle("active", mode === "day");
+    dayControls.style.display = mode === "day" ? "flex" : "none";
+    stack.style.display = mode === "list" ? "grid" : "none";
+    dayContainer.style.display = mode === "day" ? "block" : "none";
+
+    if (mode === "day") {
+      // si aucune date sélectionnée, prendre le prochain entraînement
+      if (!selectedDate) {
+        const next = findNextTraining(calendarRef());
+        selectedDate = next ? next.date : (calendarRef().items[0]?.date || todayIso());
+        input.value = selectedDate;
+      }
+      renderDayView(calendarRef(), catalogRef(), rerenderAll, selectedDate);
+    }
+  }
+
+  btnList.addEventListener("click", () => setMode("list"));
+  btnDay.addEventListener("click", () => setMode("day"));
+
+  input.addEventListener("change", () => {
+    selectedDate = input.value;
+    if (selectedDate) renderDayView(calendarRef(), catalogRef(), rerenderAll, selectedDate);
+  });
+
+  btnToday.addEventListener("click", () => {
+    const next = findNextTraining(calendarRef());
+    selectedDate = next ? next.date : (calendarRef().items[0]?.date || todayIso());
+    input.value = selectedDate;
+    renderDayView(calendarRef(), catalogRef(), rerenderAll, selectedDate);
+  });
+
+  return {
+    refreshOnCalendarChange() {
+      if (currentMode === "day" && selectedDate) {
+        renderDayView(calendarRef(), catalogRef(), rerenderAll, selectedDate);
+      }
+    }
+  };
 }
 
 // ---- Bootstrap ----
@@ -539,8 +559,13 @@ function initFab(getActiveTabId, addJeu, addEntr) {
     renderPlanning(calendar, catalog, rerenderAll);
     renderEditableGrid("grid-jeux", catalog.jeuxFoot, "Jeu collectif", "J", catalogRef, calendarRef, rerenderAll);
     renderEditableGrid("grid-entr", catalog.entrainements, "Entrainement individuel", "E", catalogRef, calendarRef, rerenderAll);
+    modes.refreshOnCalendarChange();
   };
 
+  // Modes Planning (liste/jour)
+  const modes = initPlanningModes(calendarRef, catalogRef, rerenderAll);
+
+  // Premier rendu
   rerenderAll(calendar);
 
   // FAB: add blank entries then save catalog to persist
@@ -558,25 +583,6 @@ function initFab(getActiveTabId, addJeu, addEntr) {
     catch (e) { alert("Erreur: " + (e?.message || e)); }
   };
   initFab(getActiveTabId, addJeu, addEntr);
+
   updateFabVisibility();
 })();
-
-function updateFabVisibility() {
-  const activeId = document.querySelector(".view.active")?.id;
-  const fab = document.getElementById("fab");
-  const menu = document.getElementById("fab-menu");
-  const show = activeId === "view-jeux" || activeId === "view-entrainements";
-  if (!show) menu.classList.remove("show");
-  fab.style.display = show ? "flex" : "none";
-}
-
-async function updateDay(date, payload) {
-  const res = await fetch(`/api/day/${date}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
-  });
-  const data = await res.json();
-  if (!res.ok || !data.ok) throw new Error(data.error || "Erreur serveur");
-  return data.calendar;
-}

@@ -243,86 +243,80 @@
       background: #fff7ed;
     }
 
-    /* mise en évidence non utilisé */
-    .row {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 6px;
+    /* Annulation & type samedi */
+    .cancel {
+      background: #fee2e2;
+      border: 1px solid #fecaca;
+      color: #7f1d1d;
+      border-radius: 10px;
+      padding: 8px 10px;
+      margin-bottom: 10px;
+      font-weight: 600;
     }
 
-    .row input,
-    .row textarea {
-      padding: 8px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-    }
-
-    .actions {
+    .typebar {
       display: flex;
       gap: 8px;
+      align-items: center;
       flex-wrap: wrap;
-      margin-top: 6px;
+      margin-bottom: 8px;
     }
 
-    /* Modal chooser */
-    .modal {
-      position: fixed;
-      z-index: 2;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.4);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-    }
-
-    .modal.show {
-      display: flex;
-    }
-
-    .modal-card {
-      width: min(860px, 100%);
+    .pill-type {
+      padding: 4px 8px;
+      border: 1px solid #ddd;
+      border-radius: 999px;
       background: #fff;
-      border-radius: 14px;
-      border: 1px solid #e6e6e6;
-      padding: 14px;
-      max-height: 90vh;
-      overflow: auto;
+      font-size: .85rem;
     }
 
-    .modal-head {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
-
-    .modal-head input {
-      flex: 1;
-      padding: 8px;
+    .lieu-input {
+      padding: 6px 8px;
       border: 1px solid #ddd;
       border-radius: 8px;
-      margin-left: 8px;
     }
 
-    .modal-grid {
-      display: grid;
-      gap: 10px;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+    /* --- Planning view mode switch --- */
+    .modebar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin: 12px 0;
     }
 
-    @media (max-width: 720px) {
-      .modal-grid {
-        grid-template-columns: 1fr;
-      }
+    .modebar .seg {
+      display: flex;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      overflow: hidden;
     }
 
-    .select-btn {
-      margin-top: 6px;
+    .modebar .seg button {
+      border: none;
+      background: #fff;
+      padding: 8px 12px;
+      cursor: pointer;
     }
 
-    /* Floating add stays (pour éditer catalog) */
+    .modebar .seg button.active {
+      background: #111827;
+      color: #fff;
+    }
+
+    .modebar .datepick {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .modebar input[type="date"] {
+      padding: 6px 8px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+
+    /* Floating Add Button (list tabs only) */
     .fab {
       position: fixed;
       right: 20px;
@@ -359,40 +353,32 @@
       display: flex;
     }
 
-    .cancel {
-      background: #fee2e2;
-      border: 1px solid #fecaca;
-      color: #7f1d1d;
-      border-radius: 10px;
-      padding: 8px 10px;
-      margin-bottom: 10px;
-      font-weight: 600;
-    }
-
-    .typebar {
-      display: flex;
-      gap: 8px;
+    /* Modale pleine page, au-dessus de tout */
+    .modal {
+      position: fixed !important;
+      inset: 0 !important;
+      display: none;
       align-items: center;
-      flex-wrap: wrap;
-      margin-bottom: 8px;
+      justify-content: center;
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 1000;
+      /* <- au-dessus du reste */
     }
 
-    .pill-type {
-      padding: 4px 8px;
-      border: 1px solid #ddd;
-      border-radius: 999px;
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-card {
+      width: min(860px, 100%);
+      max-height: 85vh;
+      /* évite de dépasser */
+      overflow: auto;
       background: #fff;
-      font-size: .85rem;
-    }
-
-    .typebar .btn {
-      padding: 4px 8px;
-    }
-
-    .lieu-input {
-      padding: 6px 8px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
+      border-radius: 14px;
+      border: 1px solid #e6e6e6;
+      padding: 14px;
     }
   </style>
 </head>
@@ -400,7 +386,6 @@
 <body>
   <header class="topbar">
     <h1>O.Flinois U8/U9 2025/2026</h1>
-
     <div class="tabs">
       <button class="tab active" data-target="view-planning">Planning</button>
       <button class="tab" data-target="view-jeux">Jeux collectifs</button>
@@ -410,7 +395,23 @@
 
   <!-- Planning -->
   <section id="view-planning" class="view active">
+    <div class="modebar">
+      <div class="seg" role="tablist" aria-label="Modes de vue">
+        <button id="btn-mode-list" class="active" aria-selected="true">Vue liste</button>
+        <button id="btn-mode-day" aria-selected="false">Vue jour</button>
+      </div>
+      <div class="datepick" id="day-controls" style="display:none">
+        <label for="day-input">Jour :</label>
+        <input type="date" id="day-input" />
+        <button class="btn" id="day-today">Prochain entraînement</button>
+      </div>
+    </div>
+
+    <!-- Liste complète -->
     <div class="stack" id="stack"></div>
+
+    <!-- Vue jour -->
+    <div id="day-container" style="display:none"></div>
   </section>
 
   <!-- Jeux -->
