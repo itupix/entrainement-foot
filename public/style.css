@@ -370,3 +370,104 @@ h1 {
   border: 1px solid #e6e6e6;
   padding: 14px;
 }
+
+/* --- Calendar layout --- */
+.cal-topbar {
+  margin: 12px 0 8px;
+}
+
+.cal-nav {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.cal-title {
+  font-weight: 800;
+  font-size: 1.2rem;
+  min-width: 180px;
+  text-align: center;
+}
+
+.cal-layout {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  /* calendrier + panneau droit */
+  gap: 16px;
+}
+
+@media (max-width: 960px) {
+  .cal-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  align-items: stretch;
+}
+
+.cal-header {
+  text-align: center;
+  font-weight: 700;
+  color: #374151;
+  padding: 8px 0;
+}
+
+.cal-cell {
+  background: #fff;
+  border-radius: 8px;
+  padding: 8px;
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cal-cell:hover {
+  outline: 2px solid #d1d5db;
+}
+
+.cal-daynum {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #111;
+}
+
+.cal-out {
+  opacity: .45;
+}
+
+.cal-today {
+  box-shadow: 0 0 0 2px #111827 inset;
+}
+
+.cal-selected {
+  outline: 2px solid blue;
+}
+
+.cal-training {
+  border-color: #10b981;
+}
+
+.cal-cancelled {
+  background: #fee2e2;
+  border-color: #fecaca;
+}
+
+.cal-icon {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.day-pane {
+  position: sticky;
+  top: 76px;
+}
+
+.day-pane .card {
+  margin-top: 0;
+}

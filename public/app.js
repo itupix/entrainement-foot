@@ -79,6 +79,166 @@ function renderPlanning(calendar, catalog, rerenderAll) {
   });
 }
 
+// ---- Calendrier mensuel ----
+function monthLabel(y, mZeroBased) {
+  return new Date(Date.UTC(y, mZeroBased, 1)).toLocaleDateString("fr-FR", { month: "long", year: "numeric" });
+}
+function startOfMonth(y, m0) { return new Date(Date.UTC(y, m0, 1)); }
+function endOfMonth(y, m0) { return new Date(Date.UTC(y, m0 + 1, 0)); }
+function toIsoUTC(d) { return d.toISOString().slice(0, 10); }
+
+// Construit les 42 cellules (6 lignes x 7 colonnes) pour un mois, en commençant un LUNDI
+function buildMonthCells(year, month0) {
+  const first = startOfMonth(year, month0);
+  const last = endOfMonth(year, month0);
+
+  // JS: 0=Dim...6=Sam | On veut 1=Lun..7=Dim
+  let wd = first.getUTCDay(); if (wd === 0) wd = 7;
+  const offsetDays = wd - 1; // nb de jours à remonter pour tomber sur lundi
+
+  const start = new Date(first.getTime() - offsetDays * 24 * 3600 * 1000);
+  const cells = [];
+  for (let i = 0; i < 42; i++) {
+    const d = new Date(start.getTime() + i * 24 * 3600 * 1000);
+    cells.push(d);
+  }
+  return { cells, first, last };
+}
+
+// État de sélection persisté (facultatif mais sympa)
+const LS_MODE = "planningMode"; // on peut le laisser au cas où
+const LS_SELECTED = "calendarSelectedDate";
+const LS_YEARMONTH = "calendarYearMonth";
+
+function saveYM(y, m0) { localStorage.setItem(LS_YEARMONTH, JSON.stringify([y, m0])); }
+function loadYM() {
+  try { const v = JSON.parse(localStorage.getItem(LS_YEARMONTH)); if (Array.isArray(v) && v.length === 2) return v; } catch { }
+  const now = new Date(); return [now.getUTCFullYear(), now.getUTCMonth()];
+}
+
+function renderCalendar(calendar, catalog, rerenderAll, state) {
+  const calendarEl = document.getElementById("calendar");
+  const titleEl = document.getElementById("cal-title");
+  const dayPane = document.getElementById("day-pane-content");
+
+  // état
+  const [year, month0] = state.currentYM;
+  titleEl.textContent = monthLabel(year, month0);
+
+  // construire les cellules
+  const { cells, first, last } = buildMonthCells(year, month0);
+
+  // indexation des items par date
+  const byDate = new Map();
+  (calendar.items || []).forEach(x => byDate.set(x.date, x));
+
+  // sélection par défaut: aujourd'hui si dans mois courant, sinon 1er du mois
+  if (!state.selectedDate) {
+    const today = todayIso();
+    const inRange = (dIso) => {
+      const d = new Date(dIso + "T00:00:00Z");
+      return d >= startOfMonth(year, month0) && d <= endOfMonth(year, month0);
+    };
+    state.selectedDate = inRange(today) ? today : toIsoUTC(first);
+  }
+
+  // Dessin
+  // On enlève les anciennes cellules (en gardant les headers)
+  // headers = 7 .cal-header déjà dans le HTML
+  // donc on supprime tout ce qui suit
+  Array.from(calendarEl.querySelectorAll(".cal-cell")).forEach(n => n.remove());
+
+  const usages = countUsages(calendar);
+
+  cells.forEach(d => {
+    const iso = toIsoUTC(d);
+    const isOut = (d < first || d > last);
+
+    const cell = document.createElement("div");
+    cell.className = "cal-cell";
+    if (isOut) cell.classList.add("cal-out");
+    if (iso === todayIso()) cell.classList.add("cal-today");
+    if (iso === state.selectedDate) cell.classList.add("cal-selected");
+
+    // infos
+    const dayNum = document.createElement("div");
+    dayNum.className = "cal-daynum";
+    dayNum.textContent = d.getUTCDate();
+    cell.appendChild(dayNum);
+
+    const item = byDate.get(iso);
+    if (item) {
+      const icon = document.createElement("div");
+      icon.className = "cal-icon";
+
+      if (item.cancelled?.is) {
+        cell.classList.add("cal-cancelled");
+        icon.textContent = "🚫";
+      } else if (item.weekday === "mercredi" || (item.weekday === "samedi" && item.type === "entrainement")) {
+        cell.classList.add("cal-training");
+        icon.textContent = "⚽";
+      } else if (item.weekday === "samedi" && item.type === "plateau") {
+        icon.textContent = "🏟️";
+      } else if (item.weekday === "samedi" && item.type === "libre") {
+        icon.textContent = "💤";
+      }
+
+      cell.appendChild(icon);
+    }
+
+    cell.addEventListener("click", () => {
+      state.selectedDate = iso;
+      localStorage.setItem(LS_SELECTED, state.selectedDate);
+      renderCalendar(calendar, catalog, rerenderAll, state);
+      // panneau droit
+      dayPane.innerHTML = "";
+      if (item) {
+        const card = renderDayCard(item, calendar, catalog, usages, (cal) => {
+          rerenderAll(cal);
+          // après mutation, re-rendre panneau (pour garder la date en cours)
+          const updated = (cal.items || []).find(x => x.date === state.selectedDate);
+          dayPane.innerHTML = "";
+          if (updated) {
+            const usages2 = countUsages(cal);
+            dayPane.appendChild(renderDayCard(updated, cal, catalog, usages2, rerenderAll));
+          }
+          // et le calendrier (pour badges/annulation)
+          renderCalendar(cal, catalog, rerenderAll, state);
+        });
+        dayPane.appendChild(card);
+      } else {
+        const p = document.createElement("p");
+        p.textContent = "Aucune séance ce jour.";
+        dayPane.appendChild(p);
+      }
+    });
+
+    calendarEl.appendChild(cell);
+  });
+
+  // panneau droit au premier rendu / au changement de mois
+  const selectedItem = byDate.get(state.selectedDate);
+  dayPane.innerHTML = "";
+  if (selectedItem) {
+    const card = renderDayCard(selectedItem, calendar, catalog, usages, (cal) => {
+      rerenderAll(cal);
+      // rafraîchir panneau et calendrier après action
+      const updated = (cal.items || []).find(x => x.date === state.selectedDate);
+      dayPane.innerHTML = "";
+      if (updated) {
+        const usages2 = countUsages(cal);
+        dayPane.appendChild(renderDayCard(updated, cal, catalog, usages2, rerenderAll));
+      }
+      renderCalendar(cal, catalog, rerenderAll, state);
+    });
+    dayPane.appendChild(card);
+  } else {
+    const p = document.createElement("p");
+    p.textContent = "Aucune séance ce jour.";
+    dayPane.appendChild(p);
+  }
+}
+
 // ---- Rendu d’une carte de jour (réutilisé par vue liste ET vue jour) ----
 function renderDayCard(it, calendar, catalog, usages, rerenderAll) {
   const card = document.createElement("div");
@@ -542,7 +702,7 @@ function initPlanningModes(calendarRef, catalogRef, rerenderAll) {
   };
 }
 
-// ---- Bootstrap ----
+// --- Bootstrap ---
 (async function () {
   initTabs();
 
@@ -550,34 +710,48 @@ function initPlanningModes(calendarRef, catalogRef, rerenderAll) {
     fetch("/api/calendar"),
     fetch("/api/catalog")
   ]);
-
-  if (!calRes.ok) {
-    document.getElementById("stack").innerHTML = "<p>Erreur: impossible de charger le calendrier.</p>";
-    return;
-  }
-
+  if (!calRes.ok) { document.getElementById("stack")?.remove(); } // stack n'existe plus
   let calendar = await calRes.json();
-  if (!catRes.ok) return;
   let catalog = await catRes.json();
 
   const calendarRef = () => calendar;
   const catalogRef = () => catalog;
 
+  // état du calendrier (persisté)
+  const savedYM = loadYM();
+  const savedSel = localStorage.getItem(LS_SELECTED) || null;
+  const state = { currentYM: savedYM, selectedDate: savedSel };
+
+  // Rendu global (planning => calendrier maintenant)
   const rerenderAll = (newCalendar) => {
     if (newCalendar) calendar = newCalendar;
-    renderPlanning(calendar, catalog, rerenderAll);
+    renderCalendar(calendar, catalog, rerenderAll, state);
     renderEditableGrid("grid-jeux", catalog.jeuxFoot, "Jeu collectif", "J", catalogRef, calendarRef, rerenderAll);
     renderEditableGrid("grid-entr", catalog.entrainements, "Entrainement individuel", "E", catalogRef, calendarRef, rerenderAll);
-    modes.refreshOnCalendarChange();
   };
 
-  // Modes Planning (liste/jour)
-  const modes = initPlanningModes(calendarRef, catalogRef, rerenderAll);
+  // Contrôles mois
+  const prevBtn = document.getElementById("cal-prev");
+  const nextBtn = document.getElementById("cal-next");
+  prevBtn.addEventListener("click", () => {
+    let [y, m0] = state.currentYM;
+    m0 -= 1; if (m0 < 0) { m0 = 11; y -= 1; }
+    state.currentYM = [y, m0];
+    saveYM(y, m0);
+    renderCalendar(calendar, catalog, rerenderAll, state);
+  });
+  nextBtn.addEventListener("click", () => {
+    let [y, m0] = state.currentYM;
+    m0 += 1; if (m0 > 11) { m0 = 0; y += 1; }
+    state.currentYM = [y, m0];
+    saveYM(y, m0);
+    renderCalendar(calendar, catalog, rerenderAll, state);
+  });
 
   // Premier rendu
   rerenderAll(calendar);
 
-  // FAB: add blank entries then save catalog to persist
+  // FAB (inchangé): visible seulement dans les onglets listes
   const getActiveTabId = () => (document.querySelector(".view.active")?.id || "view-planning");
   const addJeu = async () => {
     const id = nextId(catalog.jeuxFoot, "J");
@@ -592,6 +766,5 @@ function initPlanningModes(calendarRef, catalogRef, rerenderAll) {
     catch (e) { alert("Erreur: " + (e?.message || e)); }
   };
   initFab(getActiveTabId, addJeu, addEntr);
-
   updateFabVisibility();
 })();

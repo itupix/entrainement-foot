@@ -18,25 +18,40 @@
     </div>
   </header>
 
-  <!-- Planning -->
+  <!-- Planning (NOUVELLE UI: Calendrier + Détail) -->
   <section id="view-planning" class="view active">
-    <div class="modebar">
-      <div class="seg" role="tablist" aria-label="Modes de vue">
-        <button id="btn-mode-list" class="active" aria-selected="true">Vue liste</button>
-        <button id="btn-mode-day" aria-selected="false">Vue jour</button>
-      </div>
-      <div class="datepick" id="day-controls" style="display:none">
-        <label for="day-input">Jour :</label>
-        <input type="date" id="day-input" />
-        <button class="btn" id="day-today">Prochain entraînement</button>
+    <div class="cal-topbar">
+      <div class="cal-nav">
+        <button class="btn" id="cal-prev" aria-label="Mois précédent">‹</button>
+        <div class="cal-title" id="cal-title">Mois</div>
+        <button class="btn" id="cal-next" aria-label="Mois suivant">›</button>
       </div>
     </div>
 
-    <!-- Liste complète -->
-    <div class="stack" id="stack"></div>
+    <div class="cal-layout">
+      <div class="calendar" id="calendar">
+        <!-- en-têtes jours -->
+        <div class="cal-header">Lun</div>
+        <div class="cal-header">Mar</div>
+        <div class="cal-header">Mer</div>
+        <div class="cal-header">Jeu</div>
+        <div class="cal-header">Ven</div>
+        <div class="cal-header">Sam</div>
+        <div class="cal-header">Dim</div>
+        <!-- cellules du mois -> injectées par JS -->
+      </div>
 
-    <!-- Vue jour -->
-    <div id="day-container" style="display:none"></div>
+      <div class="day-pane">
+        <div id="day-pane-content"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Liste complète -->
+  <div class="stack" id="stack"></div>
+
+  <!-- Vue jour -->
+  <div id="day-container" style="display:none"></div>
   </section>
 
   <!-- Jeux -->
