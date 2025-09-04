@@ -326,7 +326,16 @@ const app = express();
 app.use(express.json({ limit: "1mb" }));
 
 // Lecture
-app.get("/api/calendar", (_req, res) => res.json(calendar));
+app.get("/api/calendar", (_req, res) => {
+  try {
+    // relit l'état persistant à chaque requête
+    const onDisk = JSON.parse(fs.readFileSync(CALENDAR_PATH, "utf8"));
+    calendar = onDisk; // garde la mémoire en phase (utile pour les autres endpoints)
+    res.json(calendar);
+  } catch (e) {
+    res.status(500).json({ error: "Impossible de lire calendar.json" });
+  }
+});
 app.get("/api/catalog", (_req, res) => {
   try { res.json(JSON.parse(fs.readFileSync(CATALOG_PATH, "utf8"))); }
   catch { res.status(500).json({ error: "Impossible de lire catalog.json" }); }
