@@ -379,3 +379,4 @@ app.use(express.static(PUBLIC_DIR));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`➡️  http://localhost:${PORT}`));
+app.get("/healthz", (_req, res) => res.send("OK"));
