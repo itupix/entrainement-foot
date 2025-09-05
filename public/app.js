@@ -331,7 +331,15 @@ function renderDayCard(it, calendar, catalog, usages, rerenderAll) {
   const planEl = document.createElement("div");
   planEl.className = "plan";
 
-  it.plan.forEach((s, idx) => {
+  const steps = Array.isArray(it.plan) ? it.plan : [];
+  if (steps.length === 0) {
+    const p = document.createElement("p");
+    p.textContent = it.weekday === "samedi" && it.type === "entrainement"
+      ? "Plan non initialisé — choisissez un jeu ou un entraînement."
+      : "Aucun plan pour ce jour.";
+    planEl.appendChild(p);
+  }
+  steps.forEach((s, idx) => {
     const block = document.createElement("div");
     block.className = `block t-${s.type}`;
     const band = document.createElement("div");
@@ -551,6 +559,9 @@ function renderEditableGrid(containerId, items, typeLabel, idPrefix, catalogRef,
   const container = document.getElementById(containerId);
   container.innerHTML = "";
 
+  // ✅ toujours un tableau
+  items = Array.isArray(items) ? items : [];
+
   const usages = countUsages(calendarRef());
   const counts = typeLabel.includes("Jeu") ? usages.jeux : usages.entr;
 
@@ -725,9 +736,9 @@ function initPlanningModes(calendarRef, catalogRef, rerenderAll) {
   // Rendu global (planning => calendrier maintenant)
   const rerenderAll = (newCalendar) => {
     if (newCalendar) calendar = newCalendar;
-    renderCalendar(calendar, catalog, rerenderAll, state);
-    renderEditableGrid("grid-jeux", catalog.jeuxFoot, "Jeu collectif", "J", catalogRef, calendarRef, rerenderAll);
-    renderEditableGrid("grid-entr", catalog.entrainements, "Entrainement individuel", "E", catalogRef, calendarRef, rerenderAll);
+    renderCalendar(calendar || { items: [] }, catalog || { jeuxFoot: [], entrainements: [] }, rerenderAll, state);
+    renderEditableGrid("grid-jeux", (catalog && catalog.jeuxFoot) || [], "Jeu collectif", "J", catalogRef, calendarRef, rerenderAll);
+    renderEditableGrid("grid-entr", (catalog && catalog.entrainements) || [], "Entrainement individuel", "E", catalogRef, calendarRef, rerenderAll);
   };
 
   // Contrôles mois
