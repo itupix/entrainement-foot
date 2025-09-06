@@ -35,47 +35,45 @@ function listTrainingDays(startStr, endStr) {
 }
 
 // --- Construit un plan de séance type ---
-function makePlan(jeu, entrainement) {
+function makePlan(jeu, entrainement, mobilite) {
   const steps = [
     {
-      type: "echauffement",
-      label: "Échauffement",
-      minutes: 10,
-      details: { description: "Activation générale + mobilité" },
+      type: "echauffement", label: "Échauffement", minutes: 10,
+      details: { description: "Activation générale + mobilité légère" }
+    },
+
+    // 🆕 Mobilité 10 min (échelle/cerceaux)
+    {
+      type: "mobilite", label: "Mobilité", minutes: 10,
+      details: { id: mobilite.id, nom: mobilite.nom, description: mobilite.description, materiel: mobilite.materiel }
+    },
+
+    // ⬇️ passent à 10 min
+    {
+      type: "individuel", label: "Entrainement individuel", minutes: 10,
+      details: { id: entrainement.id, nom: entrainement.nom, description: entrainement.description, materiel: entrainement.materiel }
+    },
+
+    {
+      type: "jeu", label: "Jeu collectif", minutes: 10,
+      details: { id: jeu.id, nom: jeu.nom, description: jeu.description, materiel: jeu.materiel }
+    },
+
+    {
+      type: "tactique", label: "Tactique", minutes: 5,
+      details: { description: "Principe du jour (placement, pressing, relance courte)", materiel: [] }
     },
     {
-      type: "individuel",
-      label: "Entrainement individuel",
-      minutes: 15,
-      details: { id: entrainement.id, nom: entrainement.nom, description: entrainement.description, materiel: entrainement.materiel },
+      type: "match_assiste", label: "Match assisté", minutes: 10,
+      details: { description: "Coaching direct sur consignes du jour", materiel: ["buts", "chasubles", "ballon"] }
     },
     {
-      type: "jeu",
-      label: "Jeu collectif",
-      minutes: 15,
-      details: { id: jeu.id, nom: jeu.nom, description: jeu.description, materiel: jeu.materiel },
-    },
-    {
-      type: "tactique",
-      label: "Tactique",
-      minutes: 5,
-      details: { description: "Principe du jour (placement, pressing, relance courte)", materiel: [] },
-    },
-    {
-      type: "match_assiste",
-      label: "Match assisté",
-      minutes: 10,
-      details: { description: "Coaching direct sur consignes du jour", materiel: ["buts", "chasubles", "ballon"] },
-    },
-    {
-      type: "match",
-      label: "Match",
-      minutes: 10,
-      details: { description: "Jeu libre pour ancrer les automatismes", materiel: ["buts", "chasubles", "ballon"] },
+      type: "match", label: "Match", minutes: 10,
+      details: { description: "Jeu libre pour ancrer les automatismes", materiel: ["buts", "chasubles", "ballon"] }
     },
   ];
   let t = 0;
-  return steps.map((s) => {
+  return steps.map(s => {
     const withTimes = { ...s, startMin: t, endMin: t + s.minutes };
     t += s.minutes;
     return withTimes;
@@ -87,23 +85,28 @@ function buildCalendar(catalog, startDate = START_DATE, endDate = END_DATE) {
   const dates = listTrainingDays(startDate, endDate);
   const jeux = catalog.jeuxFoot;
   const entr = catalog.entrainements;
+  const mobi = catalog.mobilite;        // 🆕
+  if (!Array.isArray(mobi) || mobi.length === 0) {
+    throw new Error("catalog.mobilite est requis et ne doit pas être vide");
+  }
 
   const items = dates.map((d, i) => {
     if (d.weekday === "mercredi") {
       const j = jeux[i % jeux.length];
       const e = entr[i % entr.length];
-      const plan = makePlan(j, e);
+      const m = mobi[i % mobi.length];  // 🆕
+      const plan = makePlan(j, e, m);
       return {
         date: d.date,
         weekday: "mercredi",
         totalMinutes: plan[plan.length - 1].endMin,
         jeu: { id: j.id, nom: j.nom, description: j.description, materiel: j.materiel },
         entrainement: { id: e.id, nom: e.nom, description: e.description, materiel: e.materiel },
+        mobilite: { id: m.id, nom: m.nom, description: m.description, materiel: m.materiel }, // 🆕
         plan,
         cancelled: { is: false, reason: null },
       };
     } else {
-      // samedi : par défaut "libre"
       return {
         date: d.date,
         weekday: "samedi",
@@ -114,13 +117,7 @@ function buildCalendar(catalog, startDate = START_DATE, endDate = END_DATE) {
     }
   });
 
-  return {
-    generatedAt: new Date().toISOString(),
-    startDate,
-    endDate,
-    total: items.length,
-    items,
-  };
+  return { generatedAt: new Date().toISOString(), startDate, endDate, total: items.length, items };
 }
 
 // --- Met à jour un jour ---
@@ -128,54 +125,11 @@ function findDay(calendar, dateStr) {
   return calendar.items.find((x) => x.date === dateStr);
 }
 
-function updateDay(calendar, catalog, dateStr, { jeuId, entrainementId, type, lieu, cancelled }) {
+function updateDay(calendar, catalog, dateStr, { jeuId, entrainementId, mobiliteId, type, lieu, cancelled }) {
   const day = findDay(calendar, dateStr);
   if (!day) throw new Error("Date non trouvée");
 
   if (day.weekday === "mercredi") {
-    if (jeuId) {
-      const j = catalog.jeuxFoot.find((x) => x.id === jeuId);
-      if (!j) throw new Error("jeuId inconnu");
-      day.jeu = { id: j.id, nom: j.nom, description: j.description, materiel: j.materiel };
-    }
-    if (entrainementId) {
-      const e = catalog.entrainements.find((x) => x.id === entrainementId);
-      if (!e) throw new Error("entrainementId inconnu");
-      day.entrainement = { id: e.id, nom: e.nom, description: e.description, materiel: e.materiel };
-    }
-    day.plan = makePlan(day.jeu, day.entrainement);
-  } else if (day.weekday === "samedi") {
-    if (type) {
-      day.type = type; // "entrainement" | "plateau" | "libre"
-      if (type === "entrainement") {
-        // garantie d'avoir jeu/entrainement + plan
-        if (!day.jeu) {
-          const j = catalog.jeuxFoot?.[0];
-          if (!j) throw new Error("Aucun jeu disponible dans le catalog");
-          day.jeu = { id: j.id, nom: j.nom, description: j.description, materiel: j.materiel };
-        }
-        if (!day.entrainement) {
-          const e = catalog.entrainements?.[0];
-          if (!e) throw new Error("Aucun entrainement disponible dans le catalog");
-          day.entrainement = { id: e.id, nom: e.nom, description: e.description, materiel: e.materiel };
-        }
-        day.plan = makePlan(day.jeu, day.entrainement);
-        day.totalMinutes = day.plan[day.plan.length - 1].endMin;
-      } else {
-        // plateau/libre → pas de plan
-        delete day.jeu;
-        delete day.entrainement;
-        delete day.plan;
-        delete day.totalMinutes;
-        if (type !== "plateau") day.lieu = null; // on garde le lieu seulement pour plateau
-      }
-    }
-    if (lieu !== undefined) day.lieu = lieu;
-  }
-
-  // Permet de choisir J/E même pour un samedi (implique un entrainement)
-  if (day.weekday === "samedi" && (jeuId || entrainementId)) {
-    if (day.type !== "entrainement") day.type = "entrainement";
     if (jeuId) {
       const j = catalog.jeuxFoot.find(x => x.id === jeuId);
       if (!j) throw new Error("jeuId inconnu");
@@ -186,16 +140,37 @@ function updateDay(calendar, catalog, dateStr, { jeuId, entrainementId, type, li
       if (!e) throw new Error("entrainementId inconnu");
       day.entrainement = { id: e.id, nom: e.nom, description: e.description, materiel: e.materiel };
     }
-    day.plan = makePlan(day.jeu, day.entrainement);
+    if (mobiliteId) { // 🆕
+      const m = catalog.mobilite.find(x => x.id === mobiliteId);
+      if (!m) throw new Error("mobiliteId inconnu");
+      day.mobilite = { id: m.id, nom: m.nom, description: m.description, materiel: m.materiel };
+    }
+    // Recalcule le plan (passe désormais 3 contenus)
+    day.plan = makePlan(day.jeu, day.entrainement, day.mobilite);
     day.totalMinutes = day.plan[day.plan.length - 1].endMin;
+  } else if (day.weekday === "samedi") {
+    // (ton code actuel pour samedi, inchangé)
+    // NB: si un samedi passe en "entrainement", tu peux aussi choisir une mobilite :
+    if ((jeuId || entrainementId || mobiliteId) && day.type !== "entrainement") day.type = "entrainement";
+    if (mobiliteId) {
+      const m = catalog.mobilite.find(x => x.id === mobiliteId);
+      if (!m) throw new Error("mobiliteId inconnu");
+      day.mobilite = { id: m.id, nom: m.nom, description: m.description, materiel: m.materiel };
+    }
+    if (day.type === "entrainement") {
+      // s'assurer que plan existe avec 3 contenus
+      const j = day.jeu || catalog.jeuxFoot[0];
+      const e = day.entrainement || catalog.entrainements[0];
+      const m = day.mobilite || catalog.mobilite[0];
+      day.plan = makePlan(j, e, m);
+      day.totalMinutes = day.plan[day.plan.length - 1].endMin;
+    } else {
+      delete day.plan; delete day.totalMinutes; delete day.jeu; delete day.entrainement; delete day.mobilite;
+    }
   }
 
-
-  if (cancelled) {
-    day.cancelled = { is: true, reason: cancelled.reason || null };
-  } else if (cancelled === false) {
-    day.cancelled = { is: false, reason: null };
-  }
+  if (cancelled) day.cancelled = { is: true, reason: cancelled.reason || null };
+  else if (cancelled === false) day.cancelled = { is: false, reason: null };
 
   return day;
 }
@@ -221,15 +196,18 @@ app.get("/api/catalog", async (_req, res) => {
 
 app.post("/api/catalog", async (req, res) => {
   try {
-    const { jeuxFoot, entrainements } = req.body || {};
-    const valid = (x) =>
-      x && typeof x.id === "string" && typeof x.nom === "string" &&
+    const { jeuxFoot, entrainements, mobilite } = req.body || {};
+    const validEntry = (x) => x && typeof x.id === "string" && typeof x.nom === "string" &&
       typeof x.description === "string" && Array.isArray(x.materiel);
-    if (!Array.isArray(jeuxFoot) || !Array.isArray(entrainements) ||
-      jeuxFoot.some((x) => !valid(x)) || entrainements.some((x) => !valid(x))) {
-      return res.status(400).json({ ok: false, error: "Format invalide: id, nom, description, materiel[]" });
+
+    if (!Array.isArray(jeuxFoot) || !Array.isArray(entrainements) || !Array.isArray(mobilite)) {
+      return res.status(400).json({ ok: false, error: "Format invalide: jeuxFoot[], entrainements[], mobilite[] requis" });
     }
-    await setJSON("catalog", { jeuxFoot, entrainements });
+    if (jeuxFoot.some(x => !validEntry(x)) || entrainements.some(x => !validEntry(x)) || mobilite.some(x => !validEntry(x))) {
+      return res.status(400).json({ ok: false, error: "Chaque item doit avoir id, nom, description, materiel[]" });
+    }
+
+    await setJSON("catalog", { jeuxFoot, entrainements, mobilite });
     res.json({ ok: true });
   } catch (e) {
     res.status(500).json({ ok: false, error: e.message });

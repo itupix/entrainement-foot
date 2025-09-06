@@ -366,5 +366,169 @@
         "buts"
       ]
     }
+  ],
+  "mobilite": [
+    {
+      "id": "M01",
+      "nom": "Échelle pieds alternés",
+      "description": "Parcours d’échelle avec pose pied droit puis gauche dans chaque case, rythme croissant.",
+      "materiel": [
+        "échelle d’agilité"
+      ]
+    },
+    {
+      "id": "M02",
+      "nom": "Échelle 2 pieds par case",
+      "description": "Deux appuis par case, posture gainée, regard vers l’avant.",
+      "materiel": [
+        "échelle d’agilité"
+      ]
+    },
+    {
+      "id": "M03",
+      "nom": "Échelle in-in out-out",
+      "description": "Deux appuis dans la case puis deux appuis en dehors (latéral).",
+      "materiel": [
+        "échelle d’agilité"
+      ]
+    },
+    {
+      "id": "M04",
+      "nom": "Échelle latérale",
+      "description": "Déplacement latéral rapide en posant un pied par case, buste droit.",
+      "materiel": [
+        "échelle d’agilité"
+      ]
+    },
+    {
+      "id": "M05",
+      "nom": "Cerceaux sauts pieds joints",
+      "description": "Sauts de cerceau en cerceau pieds joints, réception souple.",
+      "materiel": [
+        "cerceaux"
+      ]
+    },
+    {
+      "id": "M06",
+      "nom": "Cerceaux zigzag",
+      "description": "Course en zigzag d’un cerceau à l’autre, changements d’appuis rapides.",
+      "materiel": [
+        "cerceaux"
+      ]
+    },
+    {
+      "id": "M07",
+      "nom": "Cerceaux un pied",
+      "description": "Sauts sur un pied (alterner) de cerceau en cerceau.",
+      "materiel": [
+        "cerceaux"
+      ]
+    },
+    {
+      "id": "M08",
+      "nom": "Plots pas chassés",
+      "description": "Slalom de plots en pas chassés, amplitude courte et rapide.",
+      "materiel": [
+        "plots"
+      ]
+    },
+    {
+      "id": "M09",
+      "nom": "Plots croisés",
+      "description": "Pas croisés autour des plots pour travailler coordination et hanches.",
+      "materiel": [
+        "plots"
+      ]
+    },
+    {
+      "id": "M10",
+      "nom": "Pivot 180°",
+      "description": "Sprint 5 m, pivot 180°, retour rapide, répéter plusieurs fois.",
+      "materiel": [
+        "plots"
+      ]
+    },
+    {
+      "id": "M11",
+      "nom": "Fentes avant",
+      "description": "Fentes contrôlées, genou à 90°, posture droite, alternance gauche/droite.",
+      "materiel": [
+        "aucun"
+      ]
+    },
+    {
+      "id": "M12",
+      "nom": "Montées de genoux",
+      "description": "Course sur place avec montées de genoux, bras actifs.",
+      "materiel": [
+        "aucun"
+      ]
+    },
+    {
+      "id": "M13",
+      "nom": "Talons-fesses",
+      "description": "Course sur place en ramenant les talons vers les fesses, cadence régulière.",
+      "materiel": [
+        "aucun"
+      ]
+    },
+    {
+      "id": "M14",
+      "nom": "Ouvertures de hanches",
+      "description": "Lever le genou puis ouverture latérale, marche dynamique sur 10 m.",
+      "materiel": [
+        "aucun"
+      ]
+    },
+    {
+      "id": "M15",
+      "nom": "Fermetures de hanches",
+      "description": "Lever le genou sur le côté puis ramener vers l’intérieur, marche dynamique.",
+      "materiel": [
+        "aucun"
+      ]
+    },
+    {
+      "id": "M16",
+      "nom": "Gainage planche",
+      "description": "Planche 20–30 s, 2–3 séries, dos droit, abdos gainés.",
+      "materiel": [
+        "tapis (optionnel)"
+      ]
+    },
+    {
+      "id": "M17",
+      "nom": "Pont fessier",
+      "description": "Allongé dos, monter le bassin et tenir 2 s, 10–12 répétitions.",
+      "materiel": [
+        "tapis (optionnel)"
+      ]
+    },
+    {
+      "id": "M18",
+      "nom": "Sauts latéraux",
+      "description": "Sauts latéraux par-dessus une ligne/plot bas, pieds joints.",
+      "materiel": [
+        "plots"
+      ]
+    },
+    {
+      "id": "M19",
+      "nom": "Pas rapides marque au sol",
+      "description": "Aller-retour entre deux marques à petits pas rapides (10 m).",
+      "materiel": [
+        "plots",
+        "marquages"
+      ]
+    },
+    {
+      "id": "M20",
+      "nom": "Échelle + ballon",
+      "description": "Parcours d’échelle puis conduite de balle courte, coordination + toucher.",
+      "materiel": [
+        "échelle d’agilité",
+        "ballons"
+      ]
+    }
   ]
 }
