@@ -84,6 +84,16 @@
           <button data-tool="poteau">Poteau</button>
           <button data-tool="fleche">Flèche</button>
           <button data-tool="texte">Texte</button>
+
+          <button data-tool="but">But</button>
+          <button data-tool="ballon">Ballon</button>
+          <button data-tool="haie">Haie</button>
+          <button data-tool="coupelle">Coupelle</button>
+
+          <button data-tool="rect">Rectangle</button>
+          <button data-tool="rond">Rond</button>
+          <button data-tool="triangle">Triangle</button>
+          <button data-tool="croix">Croix</button>
         </div>
 
         <div class="props">
@@ -152,6 +162,41 @@
   <div class="fab-menu" id="fab-menu">
     <button class="btn" id="fab-add-jeu">Ajouter un jeu</button>
     <button class="btn" id="fab-add-entr">Ajouter un entrainement</button>
+  </div>
+
+  <!-- Modal Détails Exercice (lecture seule) -->
+  <div class="modal" id="exercise-details-modal" style="display:none;">
+    <div class="modal-card" style="max-width:900px;width:90%;">
+      <div class="modal-head" style="display:flex;gap:8px;align-items:center;justify-content:space-between;">
+        <h3 id="exdet-title" style="margin:0;">Détails de l’exercice</h3>
+        <button class="btn" id="exdet-close">Fermer</button>
+      </div>
+
+      <div id="exdet-body" class="exdet-body"
+        style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px;">
+        <div>
+          <div class="exdet-section">
+            <div class="exdet-label">Titre</div>
+            <div id="exdet-nom" class="exdet-value"></div>
+          </div>
+          <div class="exdet-section">
+            <div class="exdet-label">Description</div>
+            <div id="exdet-desc" class="exdet-value"></div>
+          </div>
+          <div class="exdet-section">
+            <div class="exdet-label">Matériel</div>
+            <ul id="exdet-mat" class="exdet-list"></ul>
+          </div>
+        </div>
+        <div>
+          <div class="exdet-section">
+            <div class="exdet-label">Diagramme</div>
+            <div id="exdet-diagram" class="exdet-diagram"
+              style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;background:#f8fafc;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script src="./app.js" defer></script>

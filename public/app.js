@@ -94,48 +94,77 @@ function updateFabVisibility() {
       : "none";
 }
 
-// === Rendu SVG (vignette) depuis un diagram JSON du nouvel éditeur ===
-function diagramToSVG(model, opts = {}) {
-  if (!model || !Array.isArray(model.items)) return "";
-  const W = model.width || 1000, H = model.height || 600;
+// --- Vignette: diagram (éditeur) -> SVG string ---
+// API: diagramToSVG(diagram, {width=280, height=168, bg="#f8fafc"})
+function diagramToSVG(diagram, opts = {}) {
+  const W = opts.width || 280;
+  const H = opts.height || 168;
+  const BG = opts.bg ?? "#f8fafc";
 
-  const esc = (s) => String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  const model = (diagram && Array.isArray(diagram.items))
+    ? diagram
+    : { width: 1000, height: 600, items: [] };
 
-  // dessine un cône (plot)
-  const drawCone = (it) => {
-    const color = it.color || "#ef4444";
+  const vw = model.width || 1000;
+  const vh = model.height || 600;
+
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[m]));
+  const col = (c, d) => (c && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(c)) ? c : d;
+  const rotAttr = (rot, cx, cy) => rot ? ` transform="rotate(${rot} ${cx} ${cy})"` : "";
+
+  const out = [];
+  out.push(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${vw} ${vh}" preserveAspectRatio="xMidYMid meet">`);
+  out.push(`<rect x="0" y="0" width="${vw}" height="${vh}" fill="${esc(BG)}" />`);
+  out.push(`
+    <defs>
+      <marker id="tnArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#111827" />
+      </marker>
+    </defs>
+  `);
+
+  // ---- primitives ----
+  function drawCone(it) {
     const R = it.r ?? 12;
     const cx = it.x, cy = it.y;
     const h = R * 1.8;
     const yTop = cy - R - h * 0.6;
     const yBase = cy - R * 0.2;
+    const c = col(it.color, "#ef4444");
 
-    // groupe avec rotation
-    let rot = it.rot ? ` transform="rotate(${it.rot} ${cx} ${cy})"` : "";
+    const leftBase = cx - R * 0.9;
+    const rightBase = cx + R * 0.9;
+    const qCtrlY = yBase + R * 0.2;
+
+    const shine_x1 = cx - R * 0.15;
+    const shine_y1 = yTop + h * 0.25;
+    const shine_x2 = cx - R * 0.35;
+    const shine_y2 = yBase - R * 0.25;
+    const shine_qx = cx - R * 0.15;
+    const shine_qy = yBase - R * 0.15;
+    const shine_x3 = cx - R * 0.05;
+    const shine_y3 = yTop + h * 0.3;
+
     return `
-      <g${rot}>
-        <path d="M ${cx} ${yTop} L ${cx - R * 0.9} ${yBase} Q ${cx} ${yBase + R * 0.2} ${cx + R * 0.9} ${yBase} Z"
-              fill="${color}" stroke="#222" stroke-width="0.5"/>
-        <path d="M ${cx - R * 0.15} ${yTop + h * 0.25} L ${cx - R * 0.35} ${yBase - R * 0.25}
-                 Q ${cx - R * 0.15} ${yBase - R * 0.15} ${cx - R * 0.05} ${yTop + h * 0.3} Z"
+      <g${rotAttr(it.rot, cx, cy)}>
+        <path d="M ${cx} ${yTop} L ${leftBase} ${yBase} Q ${cx} ${qCtrlY} ${rightBase} ${yBase} Z"
+              fill="${c}" stroke="#222" stroke-width="0.5"/>
+        <path d="M ${shine_x1} ${shine_y1} L ${shine_x2} ${shine_y2}
+                 Q ${shine_qx} ${shine_qy} ${shine_x3} ${shine_y3} Z"
               fill="#ffffff22"/>
-        <ellipse cx="${cx}" cy="${cy}" rx="${R}" ry="${R * 0.35}"
-                 fill="${color}" stroke="#222" stroke-width="0.5"/>
-      </g>
-    `;
-  };
+        <ellipse cx="${cx}" cy="${cy}" rx="${R}" ry="${R * 0.35}" fill="${c}" stroke="#222" stroke-width="0.5"/>
+      </g>`;
+  }
 
-  // dessine un joueur (tête + maillot)
-  const drawPlayer = (it) => {
-    const c = it.color || "#2563eb";
-    const cx = it.x, cy = it.y;
+  function drawPlayer(it) {
     const R = it.r ?? 14;
+    const c = col(it.color, "#2563eb");
+    const cx = it.x, cy = it.y;
     const w = R * 2.2, h = R * 2.2;
     const x0 = cx - w / 2, y0 = cy - h / 2 + 6;
-    const rot = it.rot ? ` transform="rotate(${it.rot} ${cx} ${cy})"` : "";
 
     return `
-      <g${rot}>
+      <g${rotAttr(it.rot, cx, cy)}>
         <path d="M ${x0} ${y0 + h * 0.35} Q ${cx} ${y0} ${x0 + w} ${y0 + h * 0.35}
                  L ${x0 + w} ${y0 + h * 0.85} Q ${cx} ${y0 + h} ${x0} ${y0 + h * 0.85} Z"
               fill="${c}" stroke="#1f2937" stroke-width="0.8"/>
@@ -143,74 +172,194 @@ function diagramToSVG(model, opts = {}) {
               fill="${c}" stroke="#1f2937" stroke-width="0.6"/>
         <rect x="${x0 + w - R * 0.25}" y="${y0 + h * 0.38}" width="${R * 0.6}" height="${R * 0.7}"
               fill="${c}" stroke="#1f2937" stroke-width="0.6"/>
-        <circle cx="${cx}" cy="${y0}" r="${R * 0.6}"
-              fill="#fde68a" stroke="#1f2937" stroke-width="0.8"/>
-      </g>
-    `;
+        <circle cx="${cx}" cy="${y0}" r="${R * 0.6}" fill="#fde68a" stroke="#1f2937" stroke-width="0.8"/>
+      </g>`;
+  }
+
+  function drawBall(it) {
+    const R = it.r ?? 10;
+    const c = col(it.color, "#111827");
+    const x = it.x, y = it.y;
+
+    const sx = R * 0.6, sd = R * 0.42;
+    return `
+      <g${rotAttr(it.rot, x, y)}>
+        <circle cx="${x}" cy="${y}" r="${R}" fill="#fff" stroke="#1f2937" stroke-width="1"/>
+        <line x1="${x - sx}" y1="${y}" x2="${x + sx}" y2="${y}" stroke="${c}" stroke-width="1"/>
+        <line x1="${x}" y1="${y - sx}" x2="${x}" y2="${y + sx}" stroke="${c}" stroke-width="1"/>
+        <line x1="${x - sd}" y1="${y - sd}" x2="${x + sd}" y2="${y + sd}" stroke="${c}" stroke-width="1"/>
+        <line x1="${x - sd}" y1="${y + sd}" x2="${x + sd}" y2="${y - sd}" stroke="${c}" stroke-width="1"/>
+      </g>`;
+  }
+
+  function drawGoal(it) {
+    const w = it.w ?? 100, h = it.h ?? 56;
+    const c = col(it.color, "#6b7280");
+    const cx = it.x, cy = it.y;
+    const x = cx - w / 2, y = cy - h / 2;
+    const pad = 6, nx = 8, ny = 6;
+
+    const nets = [];
+    for (let i = 0; i <= nx; i++) {
+      const lx = x + pad + (w - 2 * pad) * (i / nx);
+      nets.push(`<line x1="${lx}" y1="${y + pad}" x2="${lx}" y2="${y + h}" stroke="#cbd5e1" stroke-width="0.7"/>`);
+    }
+    for (let j = 0; j <= ny; j++) {
+      const ly = y + pad + (h - pad) * (j / ny);
+      nets.push(`<line x1="${x + pad}" y1="${ly}" x2="${x + w - pad}" y2="${ly}" stroke="#cbd5e1" stroke-width="0.7"/>`);
+    }
+    for (let d = 0; d < ny; d++) {
+      const y1 = y + pad + d * ((h - pad) / ny);
+      const x2 = x + pad + d * ((w - 2 * pad) / ny);
+      nets.push(`<line x1="${x + pad}" y1="${y1}" x2="${x2}" y2="${y + h}" stroke="#e5e7eb" stroke-width="0.6"/>`);
+    }
+
+    return `
+      <g${rotAttr(it.rot, cx, cy)}>
+        <rect x="${x}" y="${y}" width="6" height="${h}" fill="${c}"/>
+        <rect x="${x + w - 6}" y="${y}" width="6" height="${h}" fill="${c}"/>
+        <rect x="${x}" y="${y}" width="${w}" height="6" fill="${c}"/>
+        <g opacity="0.9">${nets.join("")}</g>
+      </g>`;
+  }
+
+  function drawHurdle(it) {
+    const w = it.w ?? 50, h = it.h ?? 14;
+    const x = it.x - w / 2, y = it.y - h / 2;
+    const c = col(it.color, "#e11d48");
+
+    const legW = h / 7;
+    return `
+      <g${rotAttr(it.rot, it.x, it.y)}>
+        <rect x="${x}" y="${y}" width="${w}" height="${h / 3}" fill="${c}"/>
+        <rect x="${x}" y="${y + h / 3}" width="${legW}" height="${h * 0.7}" fill="#4b5563"/>
+        <rect x="${x + w - legW}" y="${y + h / 3}" width="${legW}" height="${h * 0.7}" fill="#4b5563"/>
+      </g>`;
+  }
+
+  function drawDisc(it) {
+    const R = it.r ?? 10;
+    const cx = it.x, cy = it.y;
+    const c = col(it.color, "#f59e0b");
+    const ry = R * 0.35;
+
+    return `
+      <g${rotAttr(it.rot, cx, cy)}>
+        <ellipse cx="${cx}" cy="${cy}" rx="${R}" ry="${ry}" fill="${c}" stroke="#92400e" stroke-width="0.5"/>
+      </g>`;
+  }
+
+  function drawRect(it) {
+    const w = it.w ?? 60;
+    const h = it.h ?? Math.round(w * 2 / 3);
+    const cx = it.x, cy = it.y;
+    const x = cx - w / 2, y = cy - h / 2;
+    const c = col(it.color, "#6366f1");
+
+    return `<g${rotAttr(it.rot, cx, cy)}><rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${c}" opacity="0.85" stroke="#111827" stroke-width="1"/></g>`;
+  }
+
+  function drawCircle(it) {
+    const R = it.r ?? 16;
+    const cx = it.x, cy = it.y;
+    const c = col(it.color, "#22c55e");
+    return `<g${rotAttr(it.rot, cx, cy)}><circle cx="${cx}" cy="${cy}" r="${R}" fill="${c}" opacity="0.9" stroke="#0f172a" stroke-width="1"/></g>`;
+  }
+
+  function drawTriangle(it) {
+    const a = it.a ?? 40;
+    const h = a * Math.sqrt(3) / 2;
+    const cx = it.x, cy = it.y;
+    const p1x = cx, p1y = cy - h / 2;
+    const p2x = cx - a / 2, p2y = cy + h / 2;
+    const p3x = cx + a / 2, p3y = cy + h / 2;
+    const c = col(it.color, "#06b6d4");
+
+    return `<g${rotAttr(it.rot, cx, cy)}><path d="M ${p1x} ${p1y} L ${p2x} ${p2y} L ${p3x} ${p3y} Z" fill="${c}" opacity="0.85" stroke="#0f172a" stroke-width="1"/></g>`;
+  }
+
+  function drawCross(it) {
+    const s = it.s ?? 14;
+    const cx = it.x, cy = it.y;
+    const c = col(it.color, "#ef4444");
+    const rot = (it.rot == null ? 45 : it.rot);
+
+    const h1x = cx - s, h1y = cy - 3, h1w = s * 2, h1h = 6;
+    const v1x = cx - 3, v1y = cy - s, v1w = 6, v1h = s * 2;
+
+    return `<g${rotAttr(rot, cx, cy)}><rect x="${h1x}" y="${h1y}" width="${h1w}" height="${h1h}" fill="${c}"/><rect x="${v1x}" y="${v1y}" width="${v1w}" height="${v1h}" fill="${c}"/></g>`;
+  }
+
+  function drawRing(it) {
+    const R = it.r ?? 18;
+    const cx = it.x, cy = it.y;
+    const c = col(it.color, "#3b82f6");
+    return `<g${rotAttr(it.rot, cx, cy)}><circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${c}" stroke-width="3"/></g>`;
+  }
+
+  function drawPost(it) {
+    const cx = it.x, cy = it.y;
+    return `<g${rotAttr(it.rot, cx, cy)}><rect x="${cx - 3}" y="${cy - 20}" width="6" height="40" fill="${col(it.color, "#10b981")}"/></g>`;
+  }
+
+  function drawLadder(it) {
+    const w = it.w ?? 120, h = it.h ?? 40, steps = it.steps ?? 4;
+    const cx = it.x, cy = it.y;
+    const x = cx - w / 2, y = cy - h / 2;
+    const c = col(it.color, "#f59e0b");
+
+    const seg = [];
+    seg.push(`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="none" stroke="${c}" stroke-width="2"/>`);
+    for (let i = 1; i < steps; i++) {
+      const lx = x + (w / steps) * i;
+      seg.push(`<line x1="${lx}" y1="${y}" x2="${lx}" y2="${y + h}" stroke="${c}" stroke-width="2"/>`);
+    }
+    return `<g${rotAttr(it.rot, cx, cy)}>${seg.join("")}</g>`;
+  }
+
+  function drawArrow(it) {
+    const mx = (it.x1 + it.x2) / 2;
+    const my = (it.y1 + it.y2) / 2;
+    const stroke = col(it.color, "#111827");
+    return `
+      <g${rotAttr(it.rot || 0, mx, my)}>
+        <line x1="${it.x1}" y1="${it.y1}" x2="${it.x2}" y2="${it.y2}"
+              stroke="${stroke}" stroke-width="5" stroke-linecap="round" marker-end="url(#tnArrow)"/>
+      </g>`;
+  }
+
+  function drawText(it) {
+    const fs = it.size ?? 14;
+    const cx = it.x, cy = it.y;
+    const c = col(it.color, "#111827");
+    return `<g${rotAttr(it.rot, cx, cy)}><text x="${cx}" y="${cy}" fill="${c}" font-size="${fs}" font-family="system-ui,-apple-system,Segoe UI,Roboto,Arial">${esc(it.text || "Texte")}</text></g>`;
+  }
+
+  const drawMap = {
+    plot: drawCone,
+    joueur: drawPlayer,
+    ballon: drawBall,
+    but: drawGoal,
+    haie: drawHurdle,
+    coupelle: drawDisc,
+    rect: drawRect,
+    rond: drawCircle,
+    triangle: drawTriangle,
+    croix: drawCross,
+    cerceau: drawRing,
+    poteau: drawPost,
+    echelle: drawLadder,
+    fleche: drawArrow,
+    texte: drawText
   };
 
-  // contenu
-  const els = model.items.map(it => {
-    if (it.type === "plot") return drawCone(it);
-    if (it.type === "joueur") return drawPlayer(it);
+  (model.items || []).forEach(it => {
+    const fn = drawMap[it.type];
+    if (fn) out.push(fn(it));
+  });
 
-    if (it.type === "cerceau") {
-      const r = it.r ?? 18, c = it.color || "#3b82f6";
-      const rot = it.rot ? ` transform="rotate(${it.rot} ${it.x} ${it.y})"` : "";
-      return `<circle cx="${it.x}" cy="${it.y}" r="${r}" fill="none" stroke="${c}" stroke-width="3"${rot}/>`;
-    }
-    if (it.type === "poteau") {
-      const c = it.color || "#10b981";
-      const rot = it.rot ? ` transform="rotate(${it.rot} ${it.x} ${it.y})"` : "";
-      return `<rect x="${it.x - 3}" y="${it.y - 20}" width="6" height="40" fill="${c}"${rot}/>`;
-    }
-    if (it.type === "echelle") {
-      const w = it.w || 120, h = it.h || 40, steps = it.steps || 4, c = it.color || "#f59e0b";
-      const x = it.x - w / 2, y = it.y - h / 2;
-      let g = `<g${it.rot ? ` transform="rotate(${it.rot} ${it.x} ${it.y})"` : ""}>`;
-      g += `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="none" stroke="${c}" stroke-width="2"/>`;
-      for (let i = 1; i < steps; i++) {
-        const lx = x + (w / steps) * i;
-        g += `<line x1="${lx}" y1="${y}" x2="${lx}" y2="${y + h}" stroke="${c}" stroke-width="2"/>`;
-      }
-      g += `</g>`;
-      return g;
-    }
-    if (it.type === "fleche") {
-      const c = it.color || "#111827";
-      // ID de marker unique pour éviter collisions dans plusieurs vignettes sur la page
-      const mid = "thumbArrow-" + Math.random().toString(36).slice(2, 8);
-      return `
-        <defs>
-          <marker id="${mid}" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
-            <polygon points="0 0, 10 3.5, 0 7" fill="${c}"></polygon>
-          </marker>
-        </defs>
-        <line x1="${it.x1}" y1="${it.y1}" x2="${it.x2}" y2="${it.y2}" stroke="${c}" stroke-width="3" marker-end="url(#${mid})"/>
-      `;
-    }
-    if (it.type === "texte") {
-      const c = it.color || "#111827", size = it.size || 14;
-      const rot = it.rot ? ` transform="rotate(${it.rot} ${it.x} ${it.y})"` : "";
-      return `<text x="${it.x}" y="${it.y}" fill="${c}" font-size="${size}"${rot}>${esc(it.text || "Texte")}</text>`;
-    }
-    return "";
-  }).join("");
-
-  const showGrid = opts.grid ?? false;
-  const grid = showGrid ? `
-    <defs>
-      <pattern id="gridThumb" width="25" height="25" patternUnits="userSpaceOnUse">
-        <path d="M 25 0 L 0 0 0 25" fill="none" stroke="#e5e7eb" stroke-width="1"/>
-      </pattern>
-    </defs>
-    <rect x="0" y="0" width="${W}" height="${H}" fill="url(#gridThumb)"></rect>
-  ` : "";
-
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">
-    ${grid}
-    ${els}
-  </svg>`;
+  out.push(`</svg>`);
+  return out.join("");
 }
 
 function diagramToDataUrl(model, opts = {}) {
@@ -302,7 +451,7 @@ function ensureChooserDom() {
   if (document.getElementById("chooser")) return;
   const el = document.createElement("div");
   el.innerHTML = `
-  <div class="modal" id="chooser" style="display:none;">
+  < div class="modal" id = "chooser" style = "display:none;" >
     <div class="modal-card">
       <div class="modal-head" style="display:flex;gap:8px;align-items:center;justify-content:space-between;">
         <strong id="chooser-title">Choisir</strong>
@@ -311,7 +460,7 @@ function ensureChooserDom() {
       </div>
       <div class="grid" id="chooser-grid"></div>
     </div>
-  </div>`;
+  </div > `;
   document.body.appendChild(el.firstElementChild);
 }
 
@@ -340,7 +489,7 @@ function openChooser(title, items, onChoose) {
           <div class="band"></div>
           <h3>${x.nom}</h3>
           <p>${x.description}</p>
-        `;
+`;
         const btn = document.createElement("button");
         btn.className = "btn";
         btn.textContent = "Choisir";
@@ -388,7 +537,7 @@ function renderDayCard(it, calendar, catalog, usages, rerenderAll) {
 
   if (!isTraining) {
     const p = document.createElement("p");
-    p.textContent = it.weekday === "samedi" ? `Samedi : ${it.type || "libre"}` : "Aucune séance";
+    p.textContent = it.weekday === "samedi" ? `Samedi: ${it.type || "libre"} ` : "Aucune séance";
     card.appendChild(p);
 
     if (it.weekday === "samedi") {
@@ -410,7 +559,7 @@ function renderDayCard(it, calendar, catalog, usages, rerenderAll) {
   ech.innerHTML = `
     <div class="band"></div>
     <h3>Echauffement</h3>
-  `;
+`;
   card.appendChild(ech);
 
   // Section Mobilité
@@ -420,7 +569,7 @@ function renderDayCard(it, calendar, catalog, usages, rerenderAll) {
     <div class="band"></div>
     <h3>Mobilité</h3>
     <p>${it.mobilite?.nom ? it.mobilite.nom : "<i>non défini</i>"}</p>
-  `;
+`;
   const btnMob = document.createElement("button");
   btnMob.className = "btn";
   btnMob.textContent = "Choisir mobilité";
@@ -456,7 +605,7 @@ function renderDayCard(it, calendar, catalog, usages, rerenderAll) {
     <div class="band"></div>
     <h3>Entrainement individuel</h3>
     <p>${it.entrainement?.nom ? it.entrainement.nom : "<i>non défini</i>"}</p>
-  `;
+`;
   const btnInd = document.createElement("button");
   btnInd.className = "btn";
   btnInd.textContent = "Choisir entraînement";
@@ -490,7 +639,7 @@ function renderDayCard(it, calendar, catalog, usages, rerenderAll) {
   tactic.innerHTML = `
     <div class="band"></div>
     <h3>Tactique</h3>
-  `;
+`;
   card.appendChild(tactic);
 
   // Section Jeu collectif
@@ -500,7 +649,7 @@ function renderDayCard(it, calendar, catalog, usages, rerenderAll) {
     <div class="band"></div>
     <h3>Jeu collectif</h3>
     <p>${it.jeu?.nom ? it.jeu.nom : "<i>non défini</i>"}</p>
-  `;
+`;
   const btnJeu = document.createElement("button");
   btnJeu.className = "btn";
   btnJeu.textContent = "Choisir jeu";
@@ -534,10 +683,38 @@ function renderDayCard(it, calendar, catalog, usages, rerenderAll) {
   match.innerHTML = `
     <div class="band"></div>
     <h3>Match</h3>
-  `;
+`;
   card.appendChild(match);
 
   return card;
+}
+
+// Map type -> (libellé, icône)
+const MATERIALS_MAP = {
+  plot: { label: "Plots", icon: "🔺" },
+  coupelle: { label: "Coupelles", icon: "🟠" },
+  poteau: { label: "Poteaux", icon: "🟩" },
+  ballon: { label: "Ballons", icon: "⚽" },
+  cerceau: { label: "Cerceaux", icon: "🟦" },
+  echelle: { label: "Échelles", icon: "🪜" },
+  haie: { label: "Haies", icon: "🟪" },
+  but: { label: "Buts", icon: "🧱" }
+  // (on ignore les formes décoratives, flèches, texte, joueurs)
+};
+
+function computeMaterialsFromDiagram(diagram) {
+  const counts = {};
+  const items = (diagram && Array.isArray(diagram.items)) ? diagram.items : [];
+  for (const it of items) {
+    if (!it || !it.type) continue;
+    if (MATERIALS_MAP[it.type]) {
+      counts[it.type] = (counts[it.type] || 0) + 1;
+    }
+  }
+  // retourne un tableau trié par label
+  return Object.entries(counts)
+    .map(([type, qty]) => ({ type, qty, ...MATERIALS_MAP[type] }))
+    .sort((a, b) => a.label.localeCompare(b.label, "fr"));
 }
 
 // -----------------------
@@ -714,6 +891,88 @@ function openEditorForItem(kind, item, catalog, afterSave) {
   m.classList.add("show");
 }
 
+// ---- Détails Exercice (lecture seule) ----
+function ensureExerciseDetailsDom() {
+  // déjà dans le HTML (section 1), donc rien à générer ici.
+}
+
+function openExerciseDetails(item, opts = {}) {
+  ensureExerciseDetailsDom();
+
+  const modal = document.getElementById("exercise-details-modal");
+  const btnClose = document.getElementById("exdet-close");
+  const elTitle = document.getElementById("exdet-title");
+  const elNom = document.getElementById("exdet-nom");
+  const elDesc = document.getElementById("exdet-desc");
+  const elMat = document.getElementById("exdet-mat");
+  const elDiag = document.getElementById("exdet-diagram");
+
+  // Sécurité valeurs
+  const nom = item?.nom || "(Sans titre)";
+  const desc = item?.description || "—";
+  const mat = Array.isArray(item?.materiel) ? item.materiel : [];
+  const diag = item?.diagram;
+
+  elTitle.textContent = "Détails de l’exercice";
+  elNom.textContent = nom;
+  elDesc.textContent = desc;
+
+  // liste matériel
+  // --- dans openExerciseDetails(item) ---
+  // liste matériel (priorité au diagramme)
+  elMat.innerHTML = "";
+
+  const autoMat = computeMaterialsFromDiagram(diag);
+
+  if (autoMat.length === 0) {
+    // fallback: si tu veux, on peut ajouter ici item.materiel (manuel)
+    // const manual = Array.isArray(item?.materiel) ? item.materiel : [];
+    // if (manual.length) { manual.forEach(m => { const li=document.createElement("li"); li.textContent = m; elMat.appendChild(li); }); }
+    // else {
+    const li = document.createElement("li");
+    li.textContent = "Aucun matériel détecté";
+    li.style.color = "#6b7280";
+    elMat.appendChild(li);
+    // }
+  } else {
+    autoMat.forEach(({ icon, label, qty }) => {
+      const li = document.createElement("li");
+      li.textContent = `${icon ? icon + " " : ""}${label} × ${qty}`;
+      elMat.appendChild(li);
+    });
+  }
+
+  // diagramme (vignette)
+  elDiag.innerHTML = "";
+  try {
+    // vignette (grand format ; sera downscalée en CSS si nécessaire)
+    const svgStr = diagramToSVG(diag, { width: 1000, height: 600 });
+    elDiag.innerHTML = svgStr;
+  } catch (e) {
+    const warn = document.createElement("div");
+    warn.textContent = "Diagramme indisponible";
+    warn.style.color = "#b91c1c";
+    elDiag.appendChild(warn);
+  }
+
+  // open / close
+  function close() {
+    modal.classList.remove("show");
+    modal.style.display = "none";
+    btnClose.removeEventListener("click", close);
+    modal.removeEventListener("click", backdropClose);
+  }
+  function backdropClose(ev) {
+    if (ev.target === modal) close();
+  }
+
+  btnClose.addEventListener("click", close);
+  modal.addEventListener("click", backdropClose);
+
+  modal.style.display = "flex";
+  modal.classList.add("show");
+}
+
 function renderExercisesList(catalog, category, calendar, rerenderAll) {
   const listEl = document.getElementById("ex-list");
   if (!listEl) return;
@@ -761,6 +1020,7 @@ function renderExercisesList(catalog, category, calendar, rerenderAll) {
     // actions
     const actions = document.createElement("div");
     actions.className = "actions";
+
     const btnEdit = document.createElement("button");
     btnEdit.className = "btn";
     btnEdit.textContent = "Modifier";
@@ -769,6 +1029,12 @@ function renderExercisesList(catalog, category, calendar, rerenderAll) {
       renderExercisesList(catalog, category, calendar, rerenderAll);
     });
 
+    const btnDetails = document.createElement("button");
+    btnDetails.className = "btn";
+    btnDetails.textContent = "Détails";
+    btnDetails.onclick = () => openExerciseDetails(obj);
+
+
     const btnDel = document.createElement("button");
     btnDel.className = "btn danger";
     btnDel.textContent = "Supprimer";
@@ -776,7 +1042,7 @@ function renderExercisesList(catalog, category, calendar, rerenderAll) {
       const used = usageMap[obj.id] || 0;
       const ok = confirm(
         used
-          ? `Cet exercice est utilisé ${used} fois dans le planning.\nLe supprimer du catalogue n’affectera pas les séances déjà planifiées.\nConfirmer la suppression ?`
+          ? `Cet exercice est utilisé ${used} fois dans le planning.\nLe supprimer du catalogue n’affectera pas les séances déjà planifiées.\nConfirmer la suppression ? `
           : "Supprimer cet exercice du catalogue ?"
       );
       if (!ok) return;
@@ -822,6 +1088,7 @@ function renderExercisesList(catalog, category, calendar, rerenderAll) {
       }
     };
 
+    actions.appendChild(btnDetails);
     actions.appendChild(btnEdit);
     actions.appendChild(btnDel);
     card.appendChild(actions);

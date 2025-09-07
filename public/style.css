@@ -665,3 +665,132 @@ svg .selected {
 #editor-layer .draggable * {
   pointer-events: visiblePainted;
 }
+
+#editor-stage #grid-bg,
+#editor-stage .canvas-bg {
+  pointer-events: none;
+}
+
+#editor-layer .draggable,
+#editor-layer .draggable * {
+  pointer-events: visiblePainted;
+}
+
+.selected-outline {
+  pointer-events: none;
+}
+
+.handle {
+  cursor: pointer;
+}
+
+.handle.rotate {
+  cursor: grab;
+}
+
+.handle.resize {
+  cursor: nwse-resize;
+}
+
+.exdet-section {
+  margin-bottom: 12px;
+}
+
+.exdet-label {
+  font-size: 12px;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  margin-bottom: 4px;
+}
+
+.exdet-value {
+  font-size: 14px;
+  color: #111827;
+  white-space: pre-wrap;
+}
+
+.exdet-list {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.exdet-list li {
+  margin: 2px 0;
+}
+
+.exdet-diagram svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Modale Détails : grande, centrée, responsive */
+#exercise-details-modal .modal-card {
+  max-width: 1200px;
+  /* ↑ plus large */
+  width: 96%;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+}
+
+#exercise-details-modal .exdet-body {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  /* la colonne diagramme un peu plus large */
+  gap: 20px;
+  overflow: auto;
+  /* scroll interne si besoin */
+  padding: 8px 0 12px;
+}
+
+/* Le diagramme remplit bien l'espace */
+#exercise-details-modal .exdet-diagram {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #f8fafc;
+  padding: 8px;
+}
+
+#exercise-details-modal .exdet-diagram svg {
+  display: block;
+  width: 100%;
+  /* s'adapte à la colonne */
+  height: auto;
+}
+
+/* Petites retouches typographiques */
+.exdet-section {
+  margin-bottom: 14px;
+}
+
+.exdet-label {
+  font-size: 12px;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  margin-bottom: 6px;
+}
+
+.exdet-value {
+  font-size: 14px;
+  color: #111827;
+  white-space: pre-wrap;
+}
+
+.exdet-list {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.exdet-list li {
+  margin: 2px 0;
+}
+
+/* Responsive: une seule colonne sur mobile */
+@media (max-width: 800px) {
+  #exercise-details-modal .exdet-body {
+    grid-template-columns: 1fr;
+  }
+}
