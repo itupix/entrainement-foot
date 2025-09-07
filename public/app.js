@@ -71,27 +71,32 @@ function initTabs() {
 // FAB (+)
 // -----------------------
 // ⬇️ Ajout d'un 3e handler pour l'onglet Mobilité
-function initFab(getActiveTabId, addJeu, addEntr, addMob) {
-  const fab = document.getElementById("fab");
-  if (!fab) return;
-  fab.addEventListener("click", () => {
-    const active = getActiveTabId();
-    if (active === "view-jeux") return addJeu();
-    if (active === "view-entrainements") return addEntr();
-    if (active === "view-mobilite") return addMob();
-  });
-}
-
 function updateFabVisibility() {
   const fab = document.getElementById("fab");
   if (!fab) return;
-  const activeId = document.querySelector(".view.active")?.id;
-  fab.style.display =
-    activeId === "view-jeux" ||
-      activeId === "view-entrainements" ||
-      activeId === "view-mobilite"
-      ? "block"
-      : "none";
+  // visible uniquement sur l’onglet Exercices
+  fab.style.display = (getActiveTabId() === "view-exercices") ? "block" : "none";
+}
+
+function wireFab(catalogRef) {
+  const fab = document.getElementById("fab");
+  if (!fab) return;
+  fab.onclick = () => {
+    const cat = catalogRef ? catalogRef() : { jeuxFoot: [], entrainements: [], mobilite: [] };
+    const kind = getSelectedExerciseCategory(); // "jeux" | "entr" | "mob"
+
+    // génère un ID lisible et unique par catégorie
+    let id;
+    if (kind === "jeux") {
+      id = nextId(cat.jeuxFoot || [], "J");
+    } else if (kind === "entr") {
+      id = nextId(cat.entrainements || [], "E");
+    } else {
+      id = nextId(cat.mobilite || [], "M");
+    }
+
+    openNewExerciseInEditor(kind, id);
+  };
 }
 
 // --- Vignette: diagram (éditeur) -> SVG string ---
@@ -506,6 +511,33 @@ function openChooser(title, items, onChoose) {
   render();
   modal.style.display = "flex";
   modal.classList.add("show");
+}
+
+function getActiveTabId() {
+  return document.querySelector(".view.active")?.id || "";
+}
+function getSelectedExerciseCategory() {
+  // doit matcher l’ID de ta liste déroulante de catégories dans l’onglet Exercices
+  // valeurs attendues: "jeux", "entr", "mob"
+  const sel = document.getElementById("ex-cat-select");
+  return sel ? sel.value : "jeux";
+}
+function openNewExerciseInEditor(kind, id) {
+  // kind: "jeux" | "entr" | "mob"
+  // on ouvre l’éditeur SANS écrire le catalog ; l’éditeur créera/mettre à jour à la sauvegarde
+  const payload = {
+    kind, id,
+    name: "", description: "",
+    diagram: { width: 1000, height: 600, items: [] }
+  };
+  if (typeof window.editorLoadExercise === "function") {
+    window.editorLoadExercise(payload);
+    // affiche la modale si besoin
+    const modal = document.getElementById("editor-modal");
+    if (modal) { modal.style.display = "flex"; modal.classList.add("show"); }
+  } else {
+    alert("Éditeur indisponible (editorLoadExercise non trouvé).");
+  }
 }
 
 // -----------------------
@@ -1159,13 +1191,7 @@ function renderExercisesList(catalog, category, calendar, rerenderAll) {
     renderExercisesList(catalog, cat, calendar, rerenderAll);
   });
 
-  // (option) cache le FAB s'il existe
-  function updateFabVisibility() {
-    const fab = document.getElementById("fab");
-    if (!fab) return;
-    const activeId = document.querySelector(".view.active")?.id;
-    fab.style.display = "none"; // plus de création via FAB dans cette UI
-  }
+
 
 
   // Navigation mois
@@ -1184,30 +1210,17 @@ function renderExercisesList(catalog, category, calendar, rerenderAll) {
   rerenderAll(calendar);
 
   // FAB (+) – visible sur les 3 listes
-  const getActiveTabId = () => (document.querySelector(".view.active")?.id || "view-planning");
-  const addJeu = async () => {
-    const id = nextId(catalog.jeuxFoot, "J");
-    catalog.jeuxFoot.push({ id, nom: "", description: "", materiel: [] });
-    try { await saveCatalog(catalog); rerenderAll(); document.querySelector('.tab[data-target="view-jeux"]')?.click(); }
-    catch (e) { alert("Erreur: " + e.message); }
-  };
-  const addEntr = async () => {
-    const id = nextId(catalog.entrainements, "E");
-    catalog.entrainements.push({ id, nom: "", description: "", materiel: [] });
-    try { await saveCatalog(catalog); rerenderAll(); document.querySelector('.tab[data-target="view-entrainements"]')?.click(); }
-    catch (e) { alert("Erreur: " + e.message); }
-  };
-  // 🆕 Ajout d'un item Mobilité
-  const addMob = async () => {
-    catalog.mobilite = Array.isArray(catalog.mobilite) ? catalog.mobilite : [];
-    const id = nextId(catalog.mobilite, "M");
-    catalog.mobilite.push({ id, nom: "", description: "", materiel: [] });
-    try { await saveCatalog(catalog); rerenderAll(); document.querySelector('.tab[data-target="view-mobilite"]')?.click(); }
-    catch (e) { alert("Erreur: " + e.message); }
-  };
 
-  initFab(getActiveTabId, addJeu, addEntr, addMob);
+  // après rerenderAll(...)
+  wireFab(catalogRef);
   updateFabVisibility();
+
+  // quand on change d’onglet ou de catégorie : remettre à jour la visibilité
+  document.querySelectorAll(".tab").forEach(t => {
+    t.addEventListener("click", updateFabVisibility);
+  });
+  const catSel = document.getElementById("ex-cat-select");
+  if (catSel) catSel.addEventListener("change", () => {/* rien de spécial ici, juste pour futur */ });
 
   // Permet à editor.js de pousser le catalog fraîchement sauvegardé
   window.__setCatalogFromEditor = (fresh) => {

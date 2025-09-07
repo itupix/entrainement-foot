@@ -39,37 +39,34 @@ function makePlan(jeu, entrainement, mobilite) {
   const steps = [
     {
       type: "echauffement", label: "Échauffement", minutes: 10,
-      details: { description: "Activation générale + mobilité légère" }
+      details: { description: "Activation générale + mobilité", materiel: [] }
     },
-
-    // 🆕 Mobilité 10 min (échelle/cerceaux)
     {
       type: "mobilite", label: "Mobilité", minutes: 10,
-      details: { id: mobilite.id, nom: mobilite.nom, description: mobilite.description, materiel: mobilite.materiel }
+      details: mobilite ? { id: mobilite.id, nom: mobilite.nom, description: mobilite.description } :
+        { nom: "non défini", description: "" }
     },
-
-    // ⬇️ passent à 10 min
     {
       type: "individuel", label: "Entrainement individuel", minutes: 10,
-      details: { id: entrainement.id, nom: entrainement.nom, description: entrainement.description, materiel: entrainement.materiel }
+      details: entrainement ? { id: entrainement.id, nom: entrainement.nom, description: entrainement.description } :
+        { nom: "non défini", description: "" }
     },
-
     {
       type: "jeu", label: "Jeu collectif", minutes: 10,
-      details: { id: jeu.id, nom: jeu.nom, description: jeu.description, materiel: jeu.materiel }
+      details: jeu ? { id: jeu.id, nom: jeu.nom, description: jeu.description } :
+        { nom: "non défini", description: "" }
     },
-
     {
       type: "tactique", label: "Tactique", minutes: 5,
-      details: { description: "Principe du jour (placement, pressing, relance courte)", materiel: [] }
+      details: { description: "Principe du jour (placement, pressing, relance courte)" }
     },
     {
       type: "match_assiste", label: "Match assisté", minutes: 10,
-      details: { description: "Coaching direct sur consignes du jour", materiel: ["buts", "chasubles", "ballon"] }
+      details: { description: "Coaching direct sur consignes du jour" }
     },
     {
       type: "match", label: "Match", minutes: 10,
-      details: { description: "Jeu libre pour ancrer les automatismes", materiel: ["buts", "chasubles", "ballon"] }
+      details: { description: "Jeu libre pour ancrer les automatismes" }
     },
   ];
   let t = 0;
@@ -125,52 +122,61 @@ function findDay(calendar, dateStr) {
   return calendar.items.find((x) => x.date === dateStr);
 }
 
-function updateDay(calendar, catalog, dateStr, { jeuId, entrainementId, mobiliteId, type, lieu, cancelled }) {
+function updateDay(calendar, catalog, dateStr, { jeuId, entrainementId, mobiliteId, type, plateauLieu }) {
   const day = findDay(calendar, dateStr);
-  if (!day) throw new Error("Date non trouvée");
+  if (!day) throw new Error("Date non trouvée dans le calendrier");
 
-  if (day.weekday === "mercredi") {
-    if (jeuId) {
-      const j = catalog.jeuxFoot.find(x => x.id === jeuId);
-      if (!j) throw new Error("jeuId inconnu");
-      day.jeu = { id: j.id, nom: j.nom, description: j.description, materiel: j.materiel };
-    }
-    if (entrainementId) {
-      const e = catalog.entrainements.find(x => x.id === entrainementId);
-      if (!e) throw new Error("entrainementId inconnu");
-      day.entrainement = { id: e.id, nom: e.nom, description: e.description, materiel: e.materiel };
-    }
-    if (mobiliteId) { // 🆕
-      const m = catalog.mobilite.find(x => x.id === mobiliteId);
-      if (!m) throw new Error("mobiliteId inconnu");
-      day.mobilite = { id: m.id, nom: m.nom, description: m.description, materiel: m.materiel };
-    }
-    // Recalcule le plan (passe désormais 3 contenus)
-    day.plan = makePlan(day.jeu, day.entrainement, day.mobilite);
-    day.totalMinutes = day.plan[day.plan.length - 1].endMin;
-  } else if (day.weekday === "samedi") {
-    // (ton code actuel pour samedi, inchangé)
-    // NB: si un samedi passe en "entrainement", tu peux aussi choisir une mobilite :
-    if ((jeuId || entrainementId || mobiliteId) && day.type !== "entrainement") day.type = "entrainement";
-    if (mobiliteId) {
-      const m = catalog.mobilite.find(x => x.id === mobiliteId);
-      if (!m) throw new Error("mobiliteId inconnu");
-      day.mobilite = { id: m.id, nom: m.nom, description: m.description, materiel: m.materiel };
-    }
-    if (day.type === "entrainement") {
-      // s'assurer que plan existe avec 3 contenus
-      const j = day.jeu || catalog.jeuxFoot[0];
-      const e = day.entrainement || catalog.entrainements[0];
-      const m = day.mobilite || catalog.mobilite[0];
-      day.plan = makePlan(j, e, m);
-      day.totalMinutes = day.plan[day.plan.length - 1].endMin;
+  // 1) Gestion du type pour les samedis (entrainement / plateau / libre)
+  if (typeof type === "string") {
+    if (["entrainement", "plateau", "libre"].includes(type)) {
+      day.type = type;
+      if (type !== "entrainement") {
+        // Si pas un entrainement, on n'utilise pas de plan
+        day.plan = [];
+      }
+      if (type === "plateau") {
+        day.plateauLieu = plateauLieu || day.plateauLieu || "";
+      } else {
+        delete day.plateauLieu;
+      }
     } else {
-      delete day.plan; delete day.totalMinutes; delete day.jeu; delete day.entrainement; delete day.mobilite;
+      throw new Error("type invalide (attendu: entrainement | plateau | libre)");
     }
   }
 
-  if (cancelled) day.cancelled = { is: true, reason: cancelled.reason || null };
-  else if (cancelled === false) day.cancelled = { is: false, reason: null };
+  // 2) Appliquer les choix d'IDs s'ils existent
+  if (jeuId) {
+    const j = catalog.jeuxFoot.find(x => x.id === jeuId);
+    if (!j) throw new Error("jeuId inconnu");
+    day.jeu = { id: j.id, nom: j.nom, description: j.description, materiel: j.materiel, diagram: j.diagram };
+  }
+  if (entrainementId) {
+    const e = catalog.entrainements.find(x => x.id === entrainementId);
+    if (!e) throw new Error("entrainementId inconnu");
+    day.entrainement = { id: e.id, nom: e.nom, description: e.description, materiel: e.materiel, diagram: e.diagram };
+  }
+  if (mobiliteId) {
+    const m = (catalog.mobilite || []).find(x => x.id === mobiliteId);
+    if (!m) throw new Error("mobiliteId inconnu");
+    day.mobilite = { id: m.id, nom: m.nom, description: m.description, materiel: m.materiel, diagram: m.diagram };
+  }
+
+  // 3) Recalcul du plan uniquement si c'est une séance d'entraînement active
+  const isTraining =
+    day.cancelled?.is ? false :
+      (day.weekday === "mercredi") || (day.weekday === "samedi" && day.type === "entrainement");
+
+  if (isTraining) {
+    const j = day.jeu || null;
+    const e = day.entrainement || null;
+    const m = day.mobilite || null;
+    day.plan = makePlan(j, e, m);
+    day.totalMinutes = day.plan.length ? day.plan[day.plan.length - 1].endMin : 0;
+  } else {
+    // pas d'entrainement -> pas de plan
+    day.plan = [];
+    day.totalMinutes = 0;
+  }
 
   return day;
 }
