@@ -1,11 +1,42 @@
-let currentEdit = { kind: null, id: null }; // "jeux" | "entr" | "mob", et id de l'exercice
-
+// public/editor.js
 (function () {
+  // --- RÉFÉRENCES DOM (dans la modale) ---
+  const modal = document.getElementById("editor-modal");
   const svg = document.getElementById("editor-stage");
   const layer = document.getElementById("editor-layer");
-  if (!svg || !layer) return;
+  if (!modal || !svg || !layer) return; // HTML manquant
 
-  // ---- État global éditeur
+  // Toolbar outils
+  const toolButtons = Array.from(document.querySelectorAll('#editor-modal .tools button'));
+
+  // Propriétés exercice
+  const exName = document.getElementById("ex-name");
+  const exDesc = document.getElementById("ex-desc");
+  const kindSel = document.getElementById("ex-kind"); // "jeux" | "entr" | "mob"
+  const btnSaveEx = document.getElementById("btn-save-ex");
+
+  // Grille / snap
+  const snapToggle = document.getElementById("snap-toggle");
+  const gridSizeInp = document.getElementById("grid-size");
+  const gridBg = document.getElementById("grid-bg");
+
+  // Panneau propriétés élément
+  const propType = document.getElementById("prop-type");
+  const propX = document.getElementById("prop-x");
+  const propY = document.getElementById("prop-y");
+  const propRot = document.getElementById("prop-rot");
+  const propSize = document.getElementById("prop-size");
+  const propColor = document.getElementById("prop-color");
+  const propTextWrap = document.getElementById("prop-text-wrap");
+  const propText = document.getElementById("prop-text");
+
+  // Actions
+  const btnUndo = document.getElementById("btn-undo");
+  const btnRedo = document.getElementById("btn-redo");
+  const btnClear = document.getElementById("btn-clear");
+  const btnDelSel = document.getElementById("btn-delete-selected");
+
+  // --- ÉTAT ---
   const state = {
     tool: "select",
     selectionId: null,
@@ -19,42 +50,13 @@ let currentEdit = { kind: null, id: null }; // "jeux" | "entr" | "mob", et id de
     grid: 25
   };
 
-  // ---- Modèle (diagram)
-  let model = {
-    width: 1000, height: 600,
-    name: "", description: "",
-    items: []
-  };
+  let model = { width: 1000, height: 600, name: "", description: "", items: [] };
+  let currentEdit = { kind: null, id: null }; // "jeux" | "entr" | "mob", et id de l'exercice
 
-  // ---- DOM refs
-  const gridBg = document.getElementById("grid-bg");
-  const snapToggle = document.getElementById("snap-toggle");
-  const gridSizeInp = document.getElementById("grid-size");
-  const exName = document.getElementById("ex-name");
-  const exDesc = document.getElementById("ex-desc");
-  const btnUndo = document.getElementById("btn-undo");
-  const btnRedo = document.getElementById("btn-redo");
-  const btnClear = document.getElementById("btn-clear");
-  const btnDelSel = document.getElementById("btn-delete-selected");
-  const btnExportJson = document.getElementById("btn-export-json");
-  const btnExportSvg = document.getElementById("btn-export-svg");
-
-  // Panneau propriétés
-  const propType = document.getElementById("prop-type");
-  const propX = document.getElementById("prop-x");
-  const propY = document.getElementById("prop-y");
-  const propRot = document.getElementById("prop-rot");
-  const propSize = document.getElementById("prop-size");
-  const propColor = document.getElementById("prop-color");
-  const propText = document.getElementById("prop-text");
-  const propTextWrap = document.getElementById("prop-text-wrap");
-
-  // ---- Utils
+  // --- UTILS ---
   const uid = (p) => p + Math.random().toString(36).slice(2, 8);
   const nz = (v, d) => (v == null ? d : v);
   const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
-  const toRad = (deg) => deg * Math.PI / 180;
-
   const snapFn = (v) => state.snap ? Math.round(v / state.grid) * state.grid : v;
 
   const getMouse = (evt) => {
@@ -73,11 +75,20 @@ let currentEdit = { kind: null, id: null }; // "jeux" | "entr" | "mob", et id de
     state.future = [];
   };
 
+  const nsvg = (tag) => document.createElementNS("http://www.w3.org/2000/svg", tag);
   const itemById = (id) => model.items.find(i => i.id === id);
 
-  // ---- Rendu SVG
+  function applyTransform(el, item, centerOverride) {
+    const rot = nz(item.rot, 0);
+    if (!rot) return;
+    const cx = centerOverride?.cx ?? item.x;
+    const cy = centerOverride?.cy ?? item.y;
+    el.setAttribute("transform", `rotate(${rot} ${cx} ${cy})`);
+  }
+
+  // --- RENDU ---
   function render() {
-    // grid step
+    // Ajuste le pattern de la grille
     const pat = svg.querySelector('pattern#grid');
     if (pat) { pat.setAttribute("width", state.grid); pat.setAttribute("height", state.grid); }
 
@@ -139,7 +150,6 @@ let currentEdit = { kind: null, id: null }; // "jeux" | "entr" | "mob", et id de
         el.setAttribute("stroke", item.color || "#111827");
         el.setAttribute("stroke-width", 3);
         el.setAttribute("marker-end", "url(#arrowHead)");
-        // rotation ignorée : la flèche est définie par 2 points
       } else if (item.type === "texte") {
         el = nsvg("text");
         el.setAttribute("x", item.x);
@@ -150,71 +160,71 @@ let currentEdit = { kind: null, id: null }; // "jeux" | "entr" | "mob", et id de
         applyTransform(el, item);
       }
       if (!el) return;
-
       el.classList.add("draggable");
       el.dataset.id = item.id;
       if (item.id === state.selectionId) el.classList.add("selected");
-
       layer.appendChild(el);
     });
 
-    // prop panel
     refreshPropPanel();
   }
 
-  function nsvg(tag) { return document.createElementNS("http://www.w3.org/2000/svg", tag); }
-
-  function applyTransform(el, item, centerOverride) {
-    const rot = nz(item.rot, 0);
-    if (!rot) return;
-    const cx = centerOverride?.cx ?? item.x;
-    const cy = centerOverride?.cy ?? item.y;
-    el.setAttribute("transform", `rotate(${rot} ${cx} ${cy})`);
+  function refreshPropPanel() {
+    const itm = state.selectionId ? itemById(state.selectionId) : null;
+    propType.textContent = itm ? itm.type : "—";
+    propX.value = itm?.x ?? itm?.x1 ?? "";
+    propY.value = itm?.y ?? itm?.y1 ?? "";
+    propRot.value = itm ? nz(itm.rot, 0) : "";
+    propColor.value = toColor(itm?.color);
+    propTextWrap.style.display = itm && itm.type === "texte" ? "block" : "none";
+    propText.value = itm && itm.type === "texte" ? (itm.text || "") : "";
+    propSize.value = (
+      itm?.type === "plot" ? nz(itm.r, 8) :
+        itm?.type === "cerceau" ? nz(itm.r, 18) :
+          itm?.type === "texte" ? nz(itm.size, 14) :
+            itm?.type === "echelle" ? nz(itm.w, 120) : ""
+    );
   }
+  function toColor(c) { return (c && c.startsWith("#")) ? c : "#111827"; }
 
-  // ---- Sélection
   function selectById(id) {
     state.selectionId = id || null;
     render();
   }
 
-  // ---- Création éléments
   function addItem(obj) {
     pushHistory();
     model.items.push(obj);
     selectById(obj.id);
   }
 
-  // ---- Toolbar outils
-  document.querySelectorAll('#editor-modal .tools button').forEach(b => {
+  // --- OUTILS ---
+  toolButtons.forEach(b => {
     b.addEventListener("click", () => {
-      document.querySelectorAll('#editor-modal .tools button').forEach(x => x.classList.remove("active"));
+      toolButtons.forEach(x => x.classList.remove("active"));
       b.classList.add("active");
       state.tool = b.dataset.tool;
       if (state.tool !== "select") selectById(null);
     });
   });
-  document.querySelector('#editor-modal .tools button[data-tool="select"]')?.classList.add("active");
+  const defaultBtn = document.querySelector('#editor-modal .tools button[data-tool="select"]');
+  if (defaultBtn) defaultBtn.classList.add("active");
 
-  // ---- Nom / description exercice
+  // --- NOM / DESCRIPTION EXERCICE ---
   exName?.addEventListener("input", () => { model.name = exName.value; });
   exDesc?.addEventListener("input", () => { model.description = exDesc.value; });
 
-  // ---- Grille / snap
-  snapToggle?.addEventListener("change", () => {
-    state.snap = !!snapToggle.checked;
-  });
+  // --- SNAP / GRID ---
+  snapToggle?.addEventListener("change", () => { state.snap = !!snapToggle.checked; });
   gridSizeInp?.addEventListener("change", () => {
     state.grid = Math.max(1, parseInt(gridSizeInp.value || "25", 10));
     render();
   });
 
-  // ---- Actions
+  // --- ACTIONS ---
   btnClear?.addEventListener("click", () => {
     if (!model.items.length) return;
-    pushHistory();
-    model.items = [];
-    selectById(null);
+    pushHistory(); model.items = []; selectById(null);
   });
   btnUndo?.addEventListener("click", () => {
     if (!state.history.length) return;
@@ -230,137 +240,32 @@ let currentEdit = { kind: null, id: null }; // "jeux" | "entr" | "mob", et id de
   });
   btnDelSel?.addEventListener("click", deleteSelection);
 
-  btnExportJson?.addEventListener("click", () => {
-    const data = JSON.stringify(model, null, 2);
-    dlBlob(data, "application/json", "diagram.json");
-  });
-  btnExportSvg?.addEventListener("click", () => {
-    const clone = svg.cloneNode(true);
-    clone.querySelector("#editor-layer").innerHTML = layer.innerHTML;
-    const xml = new XMLSerializer().serializeToString(clone);
-    dlBlob(xml, "image/svg+xml", "diagram.svg");
-  });
-
-  function dlBlob(content, mime, filename) {
-    const blob = new Blob([content], { type: mime });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a"); a.href = url; a.download = filename; a.click();
-    URL.revokeObjectURL(url);
+  function deleteSelection() {
+    if (!state.selectionId) return;
+    pushHistory();
+    model.items = model.items.filter(i => i.id !== state.selectionId);
+    selectById(null);
   }
 
-  const kindSel = document.getElementById("ex-kind");
-  const btnSaveEx = document.getElementById("btn-save-ex");
-
-  btnSaveEx?.addEventListener("click", async () => {
-    if (!currentEdit.id) return alert("Aucun exercice chargé.");
-    const newKind = kindSel?.value || currentEdit.kind;
-
-    try {
-      const res = await fetch("/api/catalog");
-      if (!res.ok) throw new Error("Impossible de charger le catalog");
-      const catalog = await res.json();
-
-      // Après avoir fait: const catalog = await (await fetch("/api/catalog", { cache:"no-store" })).json();
-      const byKind = {
-        jeux: catalog.jeuxFoot || [],
-        entr: catalog.entrainements || [],
-        mob: catalog.mobilite || []
-      };
-      // ✅ alias tolérant si jamais on reçoit "jeu" (singulier)
-      byKind.jeu = byKind.jeux;
-
-      const oldKind = (currentEdit.kind === "jeu") ? "jeux" : currentEdit.kind;
-      const newKind = (kindSel?.value === "jeu") ? "jeux" : (kindSel?.value || currentEdit.kind);
-
-      // retirer de l’ancienne catégorie si elle change
-      if (oldKind !== newKind) {
-        const oldArr = byKind[oldKind];
-        const idx = oldArr.findIndex(x => x.id === currentEdit.id);
-        if (idx >= 0) oldArr.splice(idx, 1);
-      }
-
-      // insérer / mettre à jour dans la nouvelle catégorie
-      const arr = byKind[newKind];
-      let obj = arr.find(x => x.id === currentEdit.id);
-      if (!obj) {
-        obj = { id: currentEdit.id, nom: "", description: "", materiel: [] };
-        arr.push(obj);
-      }
-      obj.nom = model.name || "";
-      obj.description = model.description || "";
-      obj.diagram = model;
-
-      // refléter dans le catalog (⚠️ on n’écrit que les clés officielles)
-      catalog.jeuxFoot = byKind.jeux;
-      catalog.entrainements = byKind.entr;
-      catalog.mobilite = byKind.mob;
-
-      // POST sans cache
-      const save = await fetch("/api/catalog", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Cache-Control": "no-cache" },
-        body: JSON.stringify(catalog)
-      });
-      if (!save.ok) {
-        const j = await save.json().catch(() => ({}));
-        throw new Error(j.error || "Échec de la sauvegarde");
-      }
-
-      // re-fetch frais et pousser à l'app
-      const res2 = await fetch("/api/catalog", { cache: "no-store", headers: { "Cache-Control": "no-cache" } });
-      if (res2.ok) {
-        const fresh = await res2.json();
-        if (typeof window.__setCatalogFromEditor === "function") window.__setCatalogFromEditor(fresh);
-      }
-
-      if (!save.ok) {
-        const j = await save.json().catch(() => ({}));
-        throw new Error(j.error || "Échec de la sauvegarde");
-      }
-
-      // ⬇️ Essaye d'utiliser la réponse du POST si le backend la fournit
-      let freshCatalog = null;
-      try {
-        const payload = await save.json(); // ex. { ok:true, catalog: {...} } ou { ok:true }
-        if (payload && payload.catalog) freshCatalog = payload.catalog;
-      } catch { }
-
-      // Sinon refetch en "no-store" pour bypass tout cache
-      if (!freshCatalog) {
-        const res2 = await fetch("/api/catalog", { cache: "no-store", headers: { "Cache-Control": "no-cache" } });
-        if (res2.ok) freshCatalog = await res2.json();
-      }
-
-      if (freshCatalog && typeof window.__setCatalogFromEditor === "function") {
-        window.__setCatalogFromEditor(freshCatalog);
-      }
-
-      // Fermer la modale + feedback
-      const modal = document.getElementById("editor-modal");
-      if (modal) { modal.classList.remove("show"); modal.style.display = "none"; }
-      alert("Exercice enregistré !");
-    } catch (e) {
-      alert(e.message);
-    }
-  });
-
-  // ---- Souris / interactions
+  // --- SOURIS / INTERACTIONS (drag FIX) ---
   svg.addEventListener("mousedown", (evt) => {
     const p = getMouse(evt);
-    const target = evt.target;
-    const id = target?.dataset?.id;
+    const id = evt.target?.dataset?.id;
 
     if (state.tool === "select") {
       if (id) {
+        const itm = itemById(id);
+        if (!itm) return;
         state.draggingId = id;
         state.dragStart = p;
-        const itm = itemById(id);
-        // offset pour les types "ancrés"
+
+        // Offset FIXE (correctif du bug de déplacement)
         if (itm.type === "fleche") {
           state.dragOffset = { x: p.x - itm.x1, y: p.y - itm.y1 };
         } else {
           state.dragOffset = { x: p.x - (itm.x ?? 0), y: p.y - (itm.y ?? 0) };
         }
+
         selectById(id);
       } else {
         selectById(null);
@@ -394,20 +299,31 @@ let currentEdit = { kind: null, id: null }; // "jeux" | "entr" | "mob", et id de
     if (state.draggingId) {
       const itm = itemById(state.draggingId);
       if (!itm) return;
-      // déplacement
+
       if (itm.type === "fleche") {
-        const dx = snapFn(p.x - state.dragOffset.x) - itm.x1;
-        const dy = snapFn(p.y - state.dragOffset.y) - itm.y1;
-        itm.x1 += dx; itm.y1 += dy; itm.x2 += dx; itm.y2 += dy;
+        // déplacement de toute la flèche (conserve sa forme)
+        const newX1 = snapFn(p.x - state.dragOffset.x);
+        const newY1 = snapFn(p.y - state.dragOffset.y);
+        const dx = newX1 - itm.x1;
+        const dy = newY1 - itm.y1;
+        itm.x1 = clamp(newX1, 0, model.width);
+        itm.y1 = clamp(newY1, 0, model.height);
+        itm.x2 = clamp(itm.x2 + dx, 0, model.width);
+        itm.y2 = clamp(itm.y2 + dy, 0, model.height);
       } else {
-        itm.x = snapFn(p.x - state.dragOffset.x + (itm.x ?? 0));
-        itm.y = snapFn(p.y - state.dragOffset.y + (itm.y ?? 0));
+        // position = souris - offset (SNAP + CLAMP)
+        itm.x = clamp(snapFn(p.x - state.dragOffset.x), 0, model.width);
+        itm.y = clamp(snapFn(p.y - state.dragOffset.y), 0, model.height);
       }
       render();
-    } else if (state.drawingArrow) {
+      return;
+    }
+
+    if (state.drawingArrow) {
       const obj = itemById(state.drawingArrow.id);
       if (!obj) return;
-      obj.x2 = snapFn(p.x); obj.y2 = snapFn(p.y);
+      obj.x2 = clamp(snapFn(p.x), 0, model.width);
+      obj.y2 = clamp(snapFn(p.y), 0, model.height);
       render();
     }
   });
@@ -417,7 +333,7 @@ let currentEdit = { kind: null, id: null }; // "jeux" | "entr" | "mob", et id de
     state.draggingId = null; state.drawingArrow = null; state.dragStart = null;
   });
 
-  // ---- Edition rapide du texte (double-clic)
+  // --- ÉDITION RAPIDE TEXTE ---
   svg.addEventListener("dblclick", (evt) => {
     const id = evt.target?.dataset?.id;
     if (!id) return;
@@ -429,18 +345,15 @@ let currentEdit = { kind: null, id: null }; // "jeux" | "entr" | "mob", et id de
     }
   });
 
-  // ---- Clavier: supprimer, undo/redo, rotation fine
+  // --- CLAVIER (suppr / undo / redo / rotation fine) ---
   document.addEventListener("keydown", (e) => {
+    if (!modal.classList.contains("show")) return; // n'agit que si la modale est ouverte
     if ((e.key === "Delete" || e.key === "Backspace") && state.selectionId) {
       e.preventDefault(); deleteSelection();
     }
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") {
-      e.preventDefault(); btnUndo?.click();
-    }
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "y") {
-      e.preventDefault(); btnRedo?.click();
-    }
-    // rotation: Alt + molette (géré sur wheel), ou raccourcis Q/E
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") { e.preventDefault(); btnUndo?.click(); }
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "y") { e.preventDefault(); btnRedo?.click(); }
+
     if (state.selectionId && (e.key.toLowerCase() === "q" || e.key.toLowerCase() === "e")) {
       const itm = itemById(state.selectionId);
       if (itm && itm.type !== "fleche") {
@@ -450,8 +363,9 @@ let currentEdit = { kind: null, id: null }; // "jeux" | "entr" | "mob", et id de
     }
   });
 
-  // Rotation avec molette (Alt + scroll)
+  // Rotation Alt + molette
   svg.addEventListener("wheel", (e) => {
+    if (!modal.classList.contains("show")) return;
     if (!e.altKey || !state.selectionId) return;
     e.preventDefault();
     const itm = itemById(state.selectionId);
@@ -461,49 +375,18 @@ let currentEdit = { kind: null, id: null }; // "jeux" | "entr" | "mob", et id de
     render();
   }, { passive: false });
 
-  function deleteSelection() {
-    if (!state.selectionId) return;
-    pushHistory();
-    model.items = model.items.filter(i => i.id !== state.selectionId);
-    selectById(null);
-  }
-
-  // ---- Panneau propriétés binding
-  function refreshPropPanel() {
-    const itm = state.selectionId ? itemById(state.selectionId) : null;
-    propType.textContent = itm ? itm.type : "—";
-    propX.value = itm?.x ?? itm?.x1 ?? "";
-    propY.value = itm?.y ?? itm?.y1 ?? "";
-    propRot.value = itm ? nz(itm.rot, 0) : "";
-    propColor.value = toColor(itm?.color);
-    propTextWrap.style.display = itm && itm.type === "texte" ? "block" : "none";
-    propText.value = itm && itm.type === "texte" ? (itm.text || "") : "";
-    // size
-    propSize.value = (
-      itm?.type === "plot" ? nz(itm.r, 8) :
-        itm?.type === "cerceau" ? nz(itm.r, 18) :
-          itm?.type === "texte" ? nz(itm.size, 14) :
-            itm?.type === "echelle" ? nz(itm.w, 120) : ""
-    );
-  }
-
-  function toColor(c) {
-    const d = c || "#111827";
-    // convertit éventuellement rgb/… en hex simple si besoin
-    return d.startsWith("#") ? d : "#111827";
-  }
-
+  // --- PROPRIÉTÉS BINDINGS ---
   propX.addEventListener("change", () => {
     const itm = itemById(state.selectionId); if (!itm) return;
     const v = parseFloat(propX.value || "0");
-    if (itm.type === "fleche") { itm.x2 += (v - itm.x1); itm.x1 = v; }
+    if (itm.type === "fleche") { const dx = v - itm.x1; itm.x1 = v; itm.x2 += dx; }
     else itm.x = v;
     render(); pushHistory();
   });
   propY.addEventListener("change", () => {
     const itm = itemById(state.selectionId); if (!itm) return;
     const v = parseFloat(propY.value || "0");
-    if (itm.type === "fleche") { itm.y2 += (v - itm.y1); itm.y1 = v; }
+    if (itm.type === "fleche") { const dy = v - itm.y1; itm.y1 = v; itm.y2 += dy; }
     else itm.y = v;
     render(); pushHistory();
   });
@@ -514,48 +397,89 @@ let currentEdit = { kind: null, id: null }; // "jeux" | "entr" | "mob", et id de
   });
   propColor.addEventListener("change", () => {
     const itm = itemById(state.selectionId); if (!itm) return;
-    itm.color = propColor.value;
-    render(); pushHistory();
+    itm.color = propColor.value; render(); pushHistory();
   });
   propText.addEventListener("change", () => {
     const itm = itemById(state.selectionId); if (!itm || itm.type !== "texte") return;
-    itm.text = propText.value || "";
-    render(); pushHistory();
+    itm.text = propText.value || ""; render(); pushHistory();
   });
   propSize.addEventListener("change", () => {
     const itm = itemById(state.selectionId); if (!itm) return;
     const v = parseFloat(propSize.value || "0");
     if (itm.type === "plot" || itm.type === "cerceau") itm.r = v;
     else if (itm.type === "texte") itm.size = v;
-    else if (itm.type === "echelle") itm.w = v; // largeur de l’échelle (simple)
+    else if (itm.type === "echelle") itm.w = v;
     render(); pushHistory();
   });
 
-  // ---- API publique
-  window.getDiagramJSON = () => JSON.parse(JSON.stringify(model));
-  window.loadDiagram = (json) => {
-    try {
-      const snap = !!snapToggle?.checked;
-      model = JSON.parse(JSON.stringify(json));
-      // champs facultatifs
-      model.width = nz(model.width, 1000);
-      model.height = nz(model.height, 600);
-      model.name = nz(model.name, "");
-      model.description = nz(model.description, "");
-      model.items = Array.isArray(model.items) ? model.items : [];
-      state.history = []; state.future = []; state.selectionId = null;
-      state.snap = snap;
-      render();
-    } catch { alert("JSON invalide"); }
-  };
+  // --- SAUVEGARDE DIRECTE DANS LE CATALOG ---
+  btnSaveEx?.addEventListener("click", async () => {
+    if (!currentEdit.id) return alert("Aucun exercice chargé.");
+    const selKind = (kindSel?.value || currentEdit.kind);
+    const newKind = (selKind === "jeu") ? "jeux" : selKind; // alias tolérant
 
+    try {
+      const res = await fetch("/api/catalog", { cache: "no-store", headers: { "Cache-Control": "no-cache" } });
+      if (!res.ok) throw new Error("Impossible de charger le catalog");
+      const catalog = await res.json();
+
+      const byKind = {
+        jeux: catalog.jeuxFoot || [],
+        entr: catalog.entrainements || [],
+        mob: catalog.mobilite || []
+      };
+      byKind.jeu = byKind.jeux; // alias sécurité
+
+      const oldKind = (currentEdit.kind === "jeu") ? "jeux" : currentEdit.kind;
+
+      if (oldKind !== newKind) {
+        const oldArr = byKind[oldKind] || [];
+        const idx = oldArr.findIndex(x => x.id === currentEdit.id);
+        if (idx >= 0) oldArr.splice(idx, 1);
+      }
+
+      const arr = byKind[newKind] || [];
+      let obj = arr.find(x => x.id === currentEdit.id);
+      if (!obj) { obj = { id: currentEdit.id, nom: "", description: "", materiel: [] }; arr.push(obj); }
+
+      obj.nom = model.name || "";
+      obj.description = model.description || "";
+      obj.diagram = model;
+
+      // réécrit dans catalog
+      catalog.jeuxFoot = byKind.jeux;
+      catalog.entrainements = byKind.entr;
+      catalog.mobilite = byKind.mob;
+
+      const save = await fetch("/api/catalog", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Cache-Control": "no-cache" },
+        body: JSON.stringify(catalog)
+      });
+      if (!save.ok) {
+        const j = await save.json().catch(() => ({}));
+        throw new Error(j.error || "Échec de la sauvegarde");
+      }
+
+      const res2 = await fetch("/api/catalog", { cache: "no-store", headers: { "Cache-Control": "no-cache" } });
+      if (res2.ok) {
+        const fresh = await res2.json();
+        if (typeof window.__setCatalogFromEditor === "function") window.__setCatalogFromEditor(fresh);
+      }
+
+      // ferme la modale et feedback
+      modal.classList.remove("show"); modal.style.display = "none";
+      alert("Exercice enregistré !");
+    } catch (e) { alert(e.message); }
+  });
+
+  // --- API PUBLIQUE POUR OUVRIR UN EXERCICE ---
   window.editorLoadExercise = (payload) => {
     // payload: { kind, id, name, description, diagram }
-    currentEdit.kind = payload.kind;
+    currentEdit.kind = (payload.kind === "jeu") ? "jeux" : payload.kind; // alias
     currentEdit.id = payload.id;
 
-    // Construire le modèle à partir du diagram (ou neuf)
-    const base = payload.diagram && payload.diagram.items ? payload.diagram : { width: 1000, height: 600, items: [] };
+    const base = (payload.diagram && Array.isArray(payload.diagram.items)) ? payload.diagram : { width: 1000, height: 600, items: [] };
     model = {
       width: base.width || 1000,
       height: base.height || 600,
@@ -564,16 +488,40 @@ let currentEdit = { kind: null, id: null }; // "jeux" | "entr" | "mob", et id de
       items: Array.isArray(base.items) ? base.items : []
     };
 
-    // Pré-remplir inputs
+    // I/O init
     if (exName) exName.value = model.name || "";
     if (exDesc) exDesc.value = model.description || "";
+    if (kindSel) kindSel.value = currentEdit.kind || "jeux";
 
-    state.history = [];
-    state.future = [];
-    state.selectionId = null;
+    state.history = []; state.future = []; state.selectionId = null;
+
+    // Tool par défaut: select
+    toolButtons.forEach(x => x.classList.remove("active"));
+    const btnSel = document.querySelector('#editor-modal .tools button[data-tool="select"]');
+    if (btnSel) { btnSel.classList.add("active"); state.tool = "select"; }
+
     render();
   };
 
-  // ---- Init
+  // (optionnel) pour compat : expose aussi ces 2 helpers
+  window.getDiagramJSON = () => JSON.parse(JSON.stringify(model));
+  window.loadDiagram = (json) => {
+    try {
+      const base = (json && Array.isArray(json.items)) ? json : { width: 1000, height: 600, items: [] };
+      model = {
+        width: base.width || 1000,
+        height: base.height || 600,
+        name: base.name || "",
+        description: base.description || "",
+        items: Array.isArray(base.items) ? base.items : []
+      };
+      state.history = []; state.future = []; state.selectionId = null;
+      render();
+    } catch { alert("JSON invalide"); }
+  };
+
+  // --- INIT ---
+  state.snap = !!(snapToggle?.checked);
+  state.grid = Math.max(1, parseInt(gridSizeInp?.value || "25", 10));
   render();
 })();
