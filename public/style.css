@@ -483,3 +483,173 @@ h1 {
 .day-pane .card {
   margin-top: 0;
 }
+
+#view-editeur .editor-toolbar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  flex-wrap: wrap
+}
+
+#view-editeur .tools button,
+#view-editeur .actions button {
+  padding: 6px 10px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  border-radius: 6px;
+  cursor: pointer
+}
+
+#view-editeur .tools button.active {
+  background: #111827;
+  color: #fff;
+  border-color: #111827
+}
+
+.editor-stage-wrap {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff
+}
+
+#editor-stage {
+  width: 100%;
+  height: 60vh;
+  touch-action: none;
+  user-select: none
+}
+
+svg .draggable {
+  cursor: move
+}
+
+svg .selected {
+  outline: none;
+  filter: drop-shadow(0 0 0.5px #111827aa)
+}
+
+.diagram-thumb {
+  width: 100%;
+  max-width: 420px;
+  aspect-ratio: 5 / 3;
+  object-fit: contain;
+  display: block;
+  margin-top: 8px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+}
+
+#view-editeur .editor-toolbar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  flex-wrap: wrap
+}
+
+#view-editeur .tools button,
+#view-editeur .props button {
+  padding: 6px 10px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  border-radius: 6px;
+  cursor: pointer
+}
+
+#view-editeur .tools button.active {
+  background: #111827;
+  color: #fff;
+  border-color: #111827
+}
+
+#view-editeur .props input,
+#view-editeur .props select {
+  padding: 6px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px
+}
+
+.editor-stage-wrap {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff
+}
+
+#editor-stage {
+  width: 100%;
+  height: 60vh;
+  touch-action: none;
+  user-select: none
+}
+
+svg .draggable {
+  cursor: move
+}
+
+svg .selected {
+  filter: drop-shadow(0 0 0.5px #111827aa)
+}
+
+#prop-panel {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px;
+  padding: 8px;
+  border: 1px dashed #e5e7eb;
+  border-radius: 8px
+}
+
+#prop-panel input[type="number"] {
+  width: 100%
+}
+
+/* Exercices */
+.ex-toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 10px
+}
+
+.card-ex {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff
+}
+
+.card-ex .thumb {
+  flex: 0 0 220px
+}
+
+.card-ex img.diagram-thumb {
+  width: 220px;
+  height: 132px;
+  object-fit: contain;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff
+}
+
+.card-ex .body {
+  flex: 1
+}
+
+.card-ex .body h3 {
+  margin: 0 0 6px
+}
+
+.card-ex .actions {
+  display: flex;
+  gap: 8px;
+  align-items: center
+}

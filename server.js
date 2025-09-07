@@ -179,6 +179,16 @@ function updateDay(calendar, catalog, dateStr, { jeuId, entrainementId, mobilite
 const app = express();
 app.use(express.json({ limit: "1mb" }));
 
+app.use((req, res, next) => {
+  if (req.path.startsWith("/api/catalog") || req.path.startsWith("/api/calendar")) {
+    res.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+    res.set("Pragma", "no-cache");
+    res.set("Expires", "0");
+    res.set("Surrogate-Control", "no-store");
+  }
+  next();
+});
+
 // --- ROUTES ---
 // Catalog
 app.get("/api/catalog", async (_req, res) => {

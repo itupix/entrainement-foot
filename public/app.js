@@ -94,6 +94,77 @@ function updateFabVisibility() {
       : "none";
 }
 
+// === Rendu SVG (vignette) depuis un diagram JSON du nouvel éditeur ===
+function diagramToSVG(model, opts = {}) {
+  if (!model || !Array.isArray(model.items)) return "";
+  const W = model.width || 1000, H = model.height || 600;
+
+  // Génère les éléments SVG
+  const els = model.items.map(item => {
+    if (item.type === "plot") {
+      const r = item.r ?? 8, c = item.color || "#ef4444";
+      return `<circle cx="${item.x}" cy="${item.y}" r="${r}" fill="${c}" />`;
+    }
+    if (item.type === "cerceau") {
+      const r = item.r ?? 18, c = item.color || "#3b82f6";
+      return `<circle cx="${item.x}" cy="${item.y}" r="${r}" fill="none" stroke="${c}" stroke-width="3" />`;
+    }
+    if (item.type === "poteau") {
+      const c = item.color || "#10b981";
+      return `<rect x="${item.x - 3}" y="${item.y - 20}" width="6" height="40" fill="${c}" />`;
+    }
+    if (item.type === "echelle") {
+      const w = item.w || 120, h = item.h || 40, steps = item.steps || 4, c = item.color || "#f59e0b";
+      const x = item.x - w / 2, y = item.y - h / 2;
+      let g = `<g><rect x="${x}" y="${y}" width="${w}" height="${h}" fill="none" stroke="${c}" stroke-width="2" />`;
+      for (let i = 1; i < steps; i++) {
+        const lx = x + (w / steps) * i;
+        g += `<line x1="${lx}" y1="${y}" x2="${lx}" y2="${y + h}" stroke="${c}" stroke-width="2" />`;
+      }
+      g += `</g>`;
+      return g;
+    }
+    if (item.type === "fleche") {
+      const c = item.color || "#111827";
+      return `<defs>
+        <marker id="thumbArrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+          <polygon points="0 0, 10 3.5, 0 7" fill="${c}"></polygon>
+        </marker>
+      </defs>
+      <line x1="${item.x1}" y1="${item.y1}" x2="${item.x2}" y2="${item.y2}"
+        stroke="${c}" stroke-width="3" marker-end="url(#thumbArrow)"/>`;
+    }
+    if (item.type === "texte") {
+      const c = item.color || "#111827", size = item.size || 14;
+      const text = (item.text || "Texte").replace(/&/g, "&amp;").replace(/</g, "&lt;");
+      return `<text x="${item.x}" y="${item.y}" fill="${c}" font-size="${size}">${text}</text>`;
+    }
+    return "";
+  }).join("");
+
+  // Option vignette : fond quadrillé léger (comme l’éditeur)
+  const showGrid = opts.grid ?? false;
+  const grid = showGrid ? `
+    <defs>
+      <pattern id="gridThumb" width="25" height="25" patternUnits="userSpaceOnUse">
+        <path d="M 25 0 L 0 0 0 25" fill="none" stroke="#e5e7eb" stroke-width="1"/>
+      </pattern>
+    </defs>
+    <rect x="0" y="0" width="${W}" height="${H}" fill="url(#gridThumb)"></rect>
+  ` : "";
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">
+    ${grid}
+    ${els}
+  </svg>`;
+}
+
+function diagramToDataUrl(model, opts = {}) {
+  const svg = diagramToSVG(model, opts);
+  if (!svg) return "";
+  return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+}
+
 // -----------------------
 // Grilles éditables (Jeux/Entraînements/Mobilité)
 // -----------------------
@@ -151,6 +222,15 @@ function renderEditableGrid(containerId, items, typeLabel, idPrefix, catalogRef,
       catch (e) { alert(e.message); }
     };
     card.appendChild(save);
+
+    // Vignette si un diagram est attaché
+    if (obj.diagram && typeof obj.diagram === "object") {
+      const img = document.createElement("img");
+      img.className = "diagram-thumb";
+      img.alt = "Diagramme";
+      img.src = diagramToDataUrl(obj.diagram, { grid: false }); // grid:true si tu veux le quadrillage
+      card.appendChild(img);
+    }
 
     container.appendChild(card);
   });
@@ -298,6 +378,16 @@ function renderDayCard(it, calendar, catalog, usages, rerenderAll) {
     });
   };
   mob.appendChild(btnMob);
+
+  // thumb Mobilité si dispo
+  if (it.mobilite?.diagram) {
+    const img = document.createElement("img");
+    img.className = "diagram-thumb";
+    img.alt = "Diagramme Mobilité";
+    img.src = diagramToDataUrl(it.mobilite.diagram, { grid: false });
+    mob.appendChild(img);
+  }
+
   card.appendChild(mob);
 
   // Section Entrainement individuel
@@ -324,6 +414,15 @@ function renderDayCard(it, calendar, catalog, usages, rerenderAll) {
     });
   };
   ind.appendChild(btnInd);
+
+  if (it.entrainement?.diagram) {
+    const img = document.createElement("img");
+    img.className = "diagram-thumb";
+    img.alt = "Diagramme Entrainement";
+    img.src = diagramToDataUrl(it.entrainement.diagram, { grid: false });
+    ind.appendChild(img);
+  }
+
   card.appendChild(ind);
 
   // Section tactique
@@ -359,6 +458,15 @@ function renderDayCard(it, calendar, catalog, usages, rerenderAll) {
     });
   };
   jeu.appendChild(btnJeu);
+
+  if (it.jeu?.diagram) {
+    const img = document.createElement("img");
+    img.className = "diagram-thumb";
+    img.alt = "Diagramme Jeu";
+    img.src = diagramToDataUrl(it.jeu.diagram, { grid: false });
+    jeu.appendChild(img);
+  }
+
   card.appendChild(jeu);
 
   // Section Match
@@ -505,6 +613,170 @@ function renderCalendar(calendar, catalog, rerenderAll, state) {
   }
 }
 
+function openEditorModal() {
+  const m = document.getElementById("editor-modal");
+  m.style.display = "flex";
+  m.classList.add("show");
+}
+function closeEditorModal() {
+  const m = document.getElementById("editor-modal");
+  m.classList.remove("show");
+  m.style.display = "none";
+}
+document.getElementById("ed-close")?.addEventListener("click", closeEditorModal);
+
+function openEditorForItem(kind, item, catalog, afterSave) {
+  // Pré-remplir catégorie
+  const kindSel = document.getElementById("ex-kind");
+  if (kindSel) {
+    kindSel.value = kind; // "jeux" | "entr" | "mob"
+  }
+
+  // Pré-remplir nom/desc
+  const exName = document.getElementById("ex-name");
+  const exDesc = document.getElementById("ex-desc");
+  if (exName) exName.value = item.nom || "";
+  if (exDesc) exDesc.value = item.description || "";
+
+  // Charger le diagramme (avec nom/desc initialisés)
+  if (typeof window.editorLoadExercise === "function") {
+    window.editorLoadExercise({
+      kind,                         // catégorie actuelle
+      id: item.id,                  // id de l'exercice
+      name: item.nom || "",
+      description: item.description || "",
+      diagram: item.diagram || { width: 1000, height: 600, items: [] }
+    });
+  }
+
+  // Ouvrir la modale
+  const m = document.getElementById("editor-modal");
+  m.style.display = "flex";
+  m.classList.add("show");
+}
+
+function renderExercisesList(catalog, category, calendar, rerenderAll) {
+  const listEl = document.getElementById("ex-list");
+  if (!listEl) return;
+  listEl.innerHTML = "";
+
+  const usages = countUsages(calendar);
+  const arr = category === "jeux" ? (catalog.jeuxFoot || [])
+    : category === "entr" ? (catalog.entrainements || [])
+      : (catalog.mobilite || []);
+  // on garde exactement les clés: "jeux" | "entr" | "mob"
+  const kind = category;
+  const usageMap = category === "jeux" ? usages.jeux : category === "entr" ? usages.entr : usages.mob;
+
+  arr.forEach((obj) => {
+    const card = document.createElement("div");
+    card.className = "card-ex";
+
+    // thumb
+    const thumbWrap = document.createElement("div");
+    thumbWrap.className = "thumb";
+    const img = document.createElement("img");
+    img.className = "diagram-thumb";
+    img.alt = "Diagramme";
+    img.src = obj.diagram ? diagramToDataUrl(obj.diagram, { grid: false }) : "";
+    if (!obj.diagram) img.style.display = "none";
+    thumbWrap.appendChild(img);
+    card.appendChild(thumbWrap);
+
+    // body
+    const body = document.createElement("div");
+    body.className = "body";
+    const h3 = document.createElement("h3");
+    h3.textContent = obj.nom || "(Sans titre)";
+    const p = document.createElement("p");
+    p.textContent = obj.description || "";
+    const badge = document.createElement("div");
+    badge.className = "pill";
+    const c = usageMap[obj.id] || 0;
+    badge.textContent = c ? `${c} fois utilisé` : "Jamais utilisé";
+    body.appendChild(h3);
+    body.appendChild(p);
+    body.appendChild(badge);
+    card.appendChild(body);
+
+    // actions
+    const actions = document.createElement("div");
+    actions.className = "actions";
+    const btnEdit = document.createElement("button");
+    btnEdit.className = "btn";
+    btnEdit.textContent = "Modifier";
+    btnEdit.onclick = () => openEditorForItem(kind, obj, catalog, () => {
+      // option : callback post-save
+      renderExercisesList(catalog, category, calendar, rerenderAll);
+    });
+
+    const btnDel = document.createElement("button");
+    btnDel.className = "btn danger";
+    btnDel.textContent = "Supprimer";
+    btnDel.onclick = async () => {
+      const used = usageMap[obj.id] || 0;
+      const ok = confirm(
+        used
+          ? `Cet exercice est utilisé ${used} fois dans le planning.\nLe supprimer du catalogue n’affectera pas les séances déjà planifiées.\nConfirmer la suppression ?`
+          : "Supprimer cet exercice du catalogue ?"
+      );
+      if (!ok) return;
+
+      // ⚠️ suppression dans la bonne liste en fonction de "kind"
+      if (kind === "jeux") {
+        catalog.jeuxFoot = (catalog.jeuxFoot || []).filter(x => x.id !== obj.id);
+      } else if (kind === "entr") {
+        catalog.entrainements = (catalog.entrainements || []).filter(x => x.id !== obj.id);
+      } else if (kind === "mob") {
+        catalog.mobilite = (catalog.mobilite || []).filter(x => x.id !== obj.id);
+      }
+
+      try {
+        // 1) Sauvegarde
+        const r = await fetch("/api/catalog", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Cache-Control": "no-cache" },
+          body: JSON.stringify(catalog),
+        });
+        if (!r.ok) {
+          const j = await r.json().catch(() => ({}));
+          throw new Error(j.error || "Échec de la sauvegarde");
+        }
+
+        // 2) Recharger un catalog frais (anti-cache) et rerendre
+        const r2 = await fetch("/api/catalog", { cache: "no-store", headers: { "Cache-Control": "no-cache" } });
+        if (r2.ok) {
+          const fresh = await r2.json();
+          // remplace la référence globale et rerend (comme pour l’éditeur)
+          if (typeof window.__setCatalogFromEditor === "function") {
+            window.__setCatalogFromEditor(fresh);
+          } else {
+            catalog = fresh;
+            renderExercisesList(catalog, category, calendar, rerenderAll);
+          }
+        } else {
+          // fallback : rerendre à partir de l'objet local
+          renderExercisesList(catalog, category, calendar, rerenderAll);
+        }
+      } catch (e) {
+        alert(e.message);
+      }
+    };
+
+    actions.appendChild(btnEdit);
+    actions.appendChild(btnDel);
+    card.appendChild(actions);
+
+    listEl.appendChild(card);
+  });
+
+  if (arr.length === 0) {
+    const empty = document.createElement("p");
+    empty.textContent = "Aucun exercice dans cette catégorie.";
+    listEl.appendChild(empty);
+  }
+}
+
 // -----------------------
 // Bootstrap
 // -----------------------
@@ -544,35 +816,31 @@ function renderCalendar(calendar, catalog, rerenderAll, state) {
       rerenderAll,
       state
     );
-    renderEditableGrid(
-      "grid-jeux",
-      (catalog && catalog.jeuxFoot) || [],
-      "Jeu collectif",
-      "J",
-      catalogRef,
-      calendarRef,
-      rerenderAll
-    );
-    renderEditableGrid(
-      "grid-entr",
-      (catalog && catalog.entrainements) || [],
-      "Entrainement individuel",
-      "E",
-      catalogRef,
-      calendarRef,
-      rerenderAll
-    );
-    // 🆕 Grille Mobilité
-    renderEditableGrid(
-      "grid-mob",
-      (catalog && catalog.mobilite) || [],
-      "Mobilité",
-      "M",
-      catalogRef,
-      calendarRef,
-      rerenderAll
-    );
+    // Vue Exercices : on rend selon la catégorie courante
+    const catSel = document.getElementById("ex-cat");
+    const cat = catSel ? catSel.value : "jeux";
+    renderExercisesList(catalog, cat, calendar, rerenderAll);
   };
+
+
+  document.getElementById("ex-cat")?.addEventListener("change", (e) => {
+    renderExercisesList(catalog, e.target.value, calendar, rerenderAll);
+  });
+
+  // Quand on clique l’onglet Exercices, on rerend la liste
+  document.querySelector('.tab[data-target="view-exercices"]')?.addEventListener("click", () => {
+    const cat = document.getElementById("ex-cat")?.value || "jeux";
+    renderExercisesList(catalog, cat, calendar, rerenderAll);
+  });
+
+  // (option) cache le FAB s'il existe
+  function updateFabVisibility() {
+    const fab = document.getElementById("fab");
+    if (!fab) return;
+    const activeId = document.querySelector(".view.active")?.id;
+    fab.style.display = "none"; // plus de création via FAB dans cette UI
+  }
+
 
   // Navigation mois
   const prevBtn = document.getElementById("cal-prev");
@@ -614,4 +882,19 @@ function renderCalendar(calendar, catalog, rerenderAll, state) {
 
   initFab(getActiveTabId, addJeu, addEntr, addMob);
   updateFabVisibility();
+
+  // Permet à editor.js de pousser le catalog fraîchement sauvegardé
+  window.__setCatalogFromEditor = (fresh) => {
+    try {
+      catalog = fresh;                 // ⚠️ remplacer la référence
+      const isEx = document.getElementById("view-exercices")?.classList.contains("active");
+      const catSel = document.getElementById("ex-cat");
+      const cat = catSel ? catSel.value : "jeux";
+      if (isEx) renderExercisesList(catalog, cat, calendar, rerenderAll);
+      // rafraîchir aussi le planning pour les vignettes éventuelles
+      rerenderAll(calendar);
+    } catch (e) {
+      console.warn("Refresh catalog after editor save failed:", e);
+    }
+  };
 })();

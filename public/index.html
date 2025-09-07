@@ -11,12 +11,10 @@
 <body>
   <header class="topbar">
     <h1>O.Flinois U8/U9 2025/2026</h1>
-    <div class="tabs">
+    <nav class="tabs">
       <button class="tab active" data-target="view-planning">Planning</button>
-      <button class="tab" data-target="view-jeux">Jeux collectifs</button>
-      <button class="tab" data-target="view-entrainements">Entrainements individuels</button>
-      <button class="tab" data-target="view-mobilite">Mobilité</button>
-    </div>
+      <button class="tab" data-target="view-exercices">Exercices</button>
+    </nav>
   </header>
 
   <!-- Planning (NOUVELLE UI: Calendrier + Détail) -->
@@ -56,19 +54,85 @@
   </section>
 
   <!-- Jeux -->
-  <section id="view-jeux" class="view">
-    <div class="grid" id="grid-jeux"></div>
+  <section id="view-exercices" class="view">
+    <div class="ex-toolbar">
+      <label for="ex-cat">Catégorie :</label>
+      <select id="ex-cat">
+        <option value="jeux">Jeux collectifs</option>
+        <option value="entr">Entraînements individuels</option>
+        <option value="mob">Mobilité</option>
+      </select>
+    </div>
+    <div id="ex-list" class="grid"></div>
   </section>
 
-  <!-- Entrainements -->
-  <section id="view-entrainements" class="view">
-    <div class="grid" id="grid-entr"></div>
-  </section>
+  <div id="editor-modal" class="modal" style="display:none;">
+    <div class="modal-card modal-xl">
+      <div class="modal-head">
+        <strong>Éditeur d’exercice</strong>
+        <button class="btn" id="ed-close">Fermer</button>
+      </div>
 
-  <section id="view-mobilite" class="view">
-    <h2>Mobilité</h2>
-    <div id="grid-mob" class="grid"></div>
-  </section>
+      <!-- Barre outils + props (reprend ce qu’on a défini pour editor.js v2) -->
+      <div class="editor-toolbar">
+        <div class="tools">
+          <button data-tool="select">Sélection</button>
+          <button data-tool="plot">Plot</button>
+          <button data-tool="echelle">Échelle</button>
+          <button data-tool="cerceau">Cerceau</button>
+          <button data-tool="poteau">Poteau</button>
+          <button data-tool="fleche">Flèche</button>
+          <button data-tool="texte">Texte</button>
+        </div>
+
+        <div class="props">
+          <input id="ex-name" placeholder="Nom de l’exercice" />
+          <input id="ex-desc" placeholder="Description" />
+          <label><input type="checkbox" id="snap-toggle" checked /> Grille aimantée</label>
+          <label>Pas <input type="number" id="grid-size" min="1" value="25" style="width:64px"></label>
+          <button id="btn-undo">↶</button>
+          <button id="btn-redo">↷</button>
+          <button id="btn-delete-selected">Supprimer sélection</button>
+          <button id="btn-clear">Effacer</button>
+          <button id="btn-export-json">Exporter JSON</button>
+          <button id="btn-export-svg">Exporter SVG</button>
+          <label for="ex-kind">Catégorie :</label>
+          <select id="ex-kind">
+            <option value="jeux">Jeux collectifs</option>
+            <option value="entr">Entraînements individuels</option>
+            <option value="mob">Mobilité</option>
+          </select>
+          <button id="btn-save-ex">Enregistrer</button>
+        </div>
+      </div>
+
+      <div class="editor-stage-wrap">
+        <svg id="editor-stage" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <pattern id="grid" width="25" height="25" patternUnits="userSpaceOnUse">
+              <path d="M 25 0 L 0 0 0 25" fill="none" stroke="#e5e7eb" stroke-width="1" />
+            </pattern>
+            <marker id="arrowHead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+              <polygon points="0 0, 10 3.5, 0 7" fill="#111827"></polygon>
+            </marker>
+          </defs>
+          <rect id="grid-bg" x="0" y="0" width="1000" height="600" fill="url(#grid)"></rect>
+          <g id="editor-layer"></g>
+        </svg>
+      </div>
+
+      <div id="prop-panel">
+        <div><b>Propriétés</b></div>
+        <div>Type: <span id="prop-type">—</span></div>
+        <label>X <input type="number" id="prop-x" step="1"></label>
+        <label>Y <input type="number" id="prop-y" step="1"></label>
+        <label>Rotation° <input type="number" id="prop-rot" step="1"></label>
+        <label>Taille <input type="number" id="prop-size" step="1"></label>
+        <label>Couleur <input type="color" id="prop-color"></label>
+        <label id="prop-text-wrap">Texte <input type="text" id="prop-text"></label>
+      </div>
+    </div>
+  </div>
 
   <!-- Chooser modal -->
   <div class="modal" id="chooser">
@@ -90,6 +154,7 @@
   </div>
 
   <script src="./app.js" defer></script>
+  <script src="editor.js"></script>
 </body>
 
 </html>
