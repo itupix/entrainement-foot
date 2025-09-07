@@ -721,8 +721,8 @@ svg .selected {
 }
 
 #exercise-details-modal .exdet-body {
-  display: grid;
-  grid-template-columns: 1fr 1.4fr;
+  display: flex;
+  flex-direction: column;
   /* la colonne diagramme un peu plus large */
   gap: 20px;
   overflow: auto;

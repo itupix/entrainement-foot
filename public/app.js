@@ -11,6 +11,19 @@ function todayIso() {
   return `${yyyy}-${mm}-${dd}`;
 }
 
+function makeDetailsButton(item) {
+  const btn = document.createElement("button");
+  btn.className = "btn";
+  btn.textContent = "Détails";
+  if (item && (item.nom || item.description || item.diagram)) {
+    btn.onclick = () => openExerciseDetails(item);
+  } else {
+    btn.disabled = true;
+    btn.title = "Aucun exercice sélectionné";
+  }
+  return btn;
+}
+
 function countUsages(calendar) {
   const usages = { jeux: {}, entr: {}, mob: {} };
   if (!calendar || !Array.isArray(calendar.items)) return usages;
@@ -372,12 +385,6 @@ function diagramToDataUrl(model, opts = {}) {
   return svg ? "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg) : "";
 }
 
-function diagramToDataUrl(model, opts = {}) {
-  const svg = diagramToSVG(model, opts);
-  if (!svg) return "";
-  return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
-}
-
 // -----------------------
 // Grilles éditables (Jeux/Entraînements/Mobilité)
 // -----------------------
@@ -598,10 +605,14 @@ function renderDayCard(it, calendar, catalog, usages, rerenderAll) {
   const mob = document.createElement("div");
   mob.className = "block t-mobilite";
   mob.innerHTML = `
-    <div class="band"></div>
-    <h3>Mobilité</h3>
-    <p>${it.mobilite?.nom ? it.mobilite.nom : "<i>non défini</i>"}</p>
+  <div class="band"></div>
+  <h3>Mobilité</h3>
+  <p>${it.mobilite?.nom ? it.mobilite.nom : "<i>non défini</i>"}</p>
 `;
+  const mobActions = document.createElement("div");
+  mobActions.style.display = "flex";
+  mobActions.style.gap = "8px";
+
   const btnMob = document.createElement("button");
   btnMob.className = "btn";
   btnMob.textContent = "Choisir mobilité";
@@ -617,27 +628,23 @@ function renderDayCard(it, calendar, catalog, usages, rerenderAll) {
       } catch (e) { alert(e.message); }
     });
   };
-  mob.appendChild(btnMob);
-
-  // thumb Mobilité si dispo
-  if (it.mobilite?.diagram) {
-    const img = document.createElement("img");
-    img.className = "diagram-thumb";
-    img.alt = "Diagramme Mobilité";
-    img.src = diagramToDataUrl(it.mobilite.diagram, { grid: false });
-    mob.appendChild(img);
-  }
-
+  mobActions.appendChild(btnMob);
+  mobActions.appendChild(makeDetailsButton(it.mobilite));
+  mob.appendChild(mobActions);
   card.appendChild(mob);
 
   // Section Entrainement individuel
   const ind = document.createElement("div");
   ind.className = "block t-individuel";
   ind.innerHTML = `
-    <div class="band"></div>
-    <h3>Entrainement individuel</h3>
-    <p>${it.entrainement?.nom ? it.entrainement.nom : "<i>non défini</i>"}</p>
+  <div class="band"></div>
+  <h3>Entrainement individuel</h3>
+  <p>${it.entrainement?.nom ? it.entrainement.nom : "<i>non défini</i>"}</p>
 `;
+  const indActions = document.createElement("div");
+  indActions.style.display = "flex";
+  indActions.style.gap = "8px";
+
   const btnInd = document.createElement("button");
   btnInd.className = "btn";
   btnInd.textContent = "Choisir entraînement";
@@ -653,16 +660,9 @@ function renderDayCard(it, calendar, catalog, usages, rerenderAll) {
       } catch (e) { alert(e.message); }
     });
   };
-  ind.appendChild(btnInd);
-
-  if (it.entrainement?.diagram) {
-    const img = document.createElement("img");
-    img.className = "diagram-thumb";
-    img.alt = "Diagramme Entrainement";
-    img.src = diagramToDataUrl(it.entrainement.diagram, { grid: false });
-    ind.appendChild(img);
-  }
-
+  indActions.appendChild(btnInd);
+  indActions.appendChild(makeDetailsButton(it.entrainement));
+  ind.appendChild(indActions);
   card.appendChild(ind);
 
   // Section tactique
@@ -678,10 +678,14 @@ function renderDayCard(it, calendar, catalog, usages, rerenderAll) {
   const jeu = document.createElement("div");
   jeu.className = "block t-jeu";
   jeu.innerHTML = `
-    <div class="band"></div>
-    <h3>Jeu collectif</h3>
-    <p>${it.jeu?.nom ? it.jeu.nom : "<i>non défini</i>"}</p>
+  <div class="band"></div>
+  <h3>Jeu collectif</h3>
+  <p>${it.jeu?.nom ? it.jeu.nom : "<i>non défini</i>"}</p>
 `;
+  const jeuActions = document.createElement("div");
+  jeuActions.style.display = "flex";
+  jeuActions.style.gap = "8px";
+
   const btnJeu = document.createElement("button");
   btnJeu.className = "btn";
   btnJeu.textContent = "Choisir jeu";
@@ -697,16 +701,9 @@ function renderDayCard(it, calendar, catalog, usages, rerenderAll) {
       } catch (e) { alert(e.message); }
     });
   };
-  jeu.appendChild(btnJeu);
-
-  if (it.jeu?.diagram) {
-    const img = document.createElement("img");
-    img.className = "diagram-thumb";
-    img.alt = "Diagramme Jeu";
-    img.src = diagramToDataUrl(it.jeu.diagram, { grid: false });
-    jeu.appendChild(img);
-  }
-
+  jeuActions.appendChild(btnJeu);
+  jeuActions.appendChild(makeDetailsButton(it.jeu));
+  jeu.appendChild(jeuActions);
   card.appendChild(jeu);
 
   // Section Match
