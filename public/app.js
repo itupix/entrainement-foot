@@ -99,50 +99,104 @@ function diagramToSVG(model, opts = {}) {
   if (!model || !Array.isArray(model.items)) return "";
   const W = model.width || 1000, H = model.height || 600;
 
-  // Génère les éléments SVG
-  const els = model.items.map(item => {
-    if (item.type === "plot") {
-      const r = item.r ?? 8, c = item.color || "#ef4444";
-      return `<circle cx="${item.x}" cy="${item.y}" r="${r}" fill="${c}" />`;
+  const esc = (s) => String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;");
+
+  // dessine un cône (plot)
+  const drawCone = (it) => {
+    const color = it.color || "#ef4444";
+    const R = it.r ?? 12;
+    const cx = it.x, cy = it.y;
+    const h = R * 1.8;
+    const yTop = cy - R - h * 0.6;
+    const yBase = cy - R * 0.2;
+
+    // groupe avec rotation
+    let rot = it.rot ? ` transform="rotate(${it.rot} ${cx} ${cy})"` : "";
+    return `
+      <g${rot}>
+        <path d="M ${cx} ${yTop} L ${cx - R * 0.9} ${yBase} Q ${cx} ${yBase + R * 0.2} ${cx + R * 0.9} ${yBase} Z"
+              fill="${color}" stroke="#222" stroke-width="0.5"/>
+        <path d="M ${cx - R * 0.15} ${yTop + h * 0.25} L ${cx - R * 0.35} ${yBase - R * 0.25}
+                 Q ${cx - R * 0.15} ${yBase - R * 0.15} ${cx - R * 0.05} ${yTop + h * 0.3} Z"
+              fill="#ffffff22"/>
+        <ellipse cx="${cx}" cy="${cy}" rx="${R}" ry="${R * 0.35}"
+                 fill="${color}" stroke="#222" stroke-width="0.5"/>
+      </g>
+    `;
+  };
+
+  // dessine un joueur (tête + maillot)
+  const drawPlayer = (it) => {
+    const c = it.color || "#2563eb";
+    const cx = it.x, cy = it.y;
+    const R = it.r ?? 14;
+    const w = R * 2.2, h = R * 2.2;
+    const x0 = cx - w / 2, y0 = cy - h / 2 + 6;
+    const rot = it.rot ? ` transform="rotate(${it.rot} ${cx} ${cy})"` : "";
+
+    return `
+      <g${rot}>
+        <path d="M ${x0} ${y0 + h * 0.35} Q ${cx} ${y0} ${x0 + w} ${y0 + h * 0.35}
+                 L ${x0 + w} ${y0 + h * 0.85} Q ${cx} ${y0 + h} ${x0} ${y0 + h * 0.85} Z"
+              fill="${c}" stroke="#1f2937" stroke-width="0.8"/>
+        <rect x="${x0 - R * 0.35}" y="${y0 + h * 0.38}" width="${R * 0.6}" height="${R * 0.7}"
+              fill="${c}" stroke="#1f2937" stroke-width="0.6"/>
+        <rect x="${x0 + w - R * 0.25}" y="${y0 + h * 0.38}" width="${R * 0.6}" height="${R * 0.7}"
+              fill="${c}" stroke="#1f2937" stroke-width="0.6"/>
+        <circle cx="${cx}" cy="${y0}" r="${R * 0.6}"
+              fill="#fde68a" stroke="#1f2937" stroke-width="0.8"/>
+      </g>
+    `;
+  };
+
+  // contenu
+  const els = model.items.map(it => {
+    if (it.type === "plot") return drawCone(it);
+    if (it.type === "joueur") return drawPlayer(it);
+
+    if (it.type === "cerceau") {
+      const r = it.r ?? 18, c = it.color || "#3b82f6";
+      const rot = it.rot ? ` transform="rotate(${it.rot} ${it.x} ${it.y})"` : "";
+      return `<circle cx="${it.x}" cy="${it.y}" r="${r}" fill="none" stroke="${c}" stroke-width="3"${rot}/>`;
     }
-    if (item.type === "cerceau") {
-      const r = item.r ?? 18, c = item.color || "#3b82f6";
-      return `<circle cx="${item.x}" cy="${item.y}" r="${r}" fill="none" stroke="${c}" stroke-width="3" />`;
+    if (it.type === "poteau") {
+      const c = it.color || "#10b981";
+      const rot = it.rot ? ` transform="rotate(${it.rot} ${it.x} ${it.y})"` : "";
+      return `<rect x="${it.x - 3}" y="${it.y - 20}" width="6" height="40" fill="${c}"${rot}/>`;
     }
-    if (item.type === "poteau") {
-      const c = item.color || "#10b981";
-      return `<rect x="${item.x - 3}" y="${item.y - 20}" width="6" height="40" fill="${c}" />`;
-    }
-    if (item.type === "echelle") {
-      const w = item.w || 120, h = item.h || 40, steps = item.steps || 4, c = item.color || "#f59e0b";
-      const x = item.x - w / 2, y = item.y - h / 2;
-      let g = `<g><rect x="${x}" y="${y}" width="${w}" height="${h}" fill="none" stroke="${c}" stroke-width="2" />`;
+    if (it.type === "echelle") {
+      const w = it.w || 120, h = it.h || 40, steps = it.steps || 4, c = it.color || "#f59e0b";
+      const x = it.x - w / 2, y = it.y - h / 2;
+      let g = `<g${it.rot ? ` transform="rotate(${it.rot} ${it.x} ${it.y})"` : ""}>`;
+      g += `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="none" stroke="${c}" stroke-width="2"/>`;
       for (let i = 1; i < steps; i++) {
         const lx = x + (w / steps) * i;
-        g += `<line x1="${lx}" y1="${y}" x2="${lx}" y2="${y + h}" stroke="${c}" stroke-width="2" />`;
+        g += `<line x1="${lx}" y1="${y}" x2="${lx}" y2="${y + h}" stroke="${c}" stroke-width="2"/>`;
       }
       g += `</g>`;
       return g;
     }
-    if (item.type === "fleche") {
-      const c = item.color || "#111827";
-      return `<defs>
-        <marker id="thumbArrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
-          <polygon points="0 0, 10 3.5, 0 7" fill="${c}"></polygon>
-        </marker>
-      </defs>
-      <line x1="${item.x1}" y1="${item.y1}" x2="${item.x2}" y2="${item.y2}"
-        stroke="${c}" stroke-width="3" marker-end="url(#thumbArrow)"/>`;
+    if (it.type === "fleche") {
+      const c = it.color || "#111827";
+      // ID de marker unique pour éviter collisions dans plusieurs vignettes sur la page
+      const mid = "thumbArrow-" + Math.random().toString(36).slice(2, 8);
+      return `
+        <defs>
+          <marker id="${mid}" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="${c}"></polygon>
+          </marker>
+        </defs>
+        <line x1="${it.x1}" y1="${it.y1}" x2="${it.x2}" y2="${it.y2}" stroke="${c}" stroke-width="3" marker-end="url(#${mid})"/>
+      `;
     }
-    if (item.type === "texte") {
-      const c = item.color || "#111827", size = item.size || 14;
-      const text = (item.text || "Texte").replace(/&/g, "&amp;").replace(/</g, "&lt;");
-      return `<text x="${item.x}" y="${item.y}" fill="${c}" font-size="${size}">${text}</text>`;
+    if (it.type === "texte") {
+      const c = it.color || "#111827", size = it.size || 14;
+      const rot = it.rot ? ` transform="rotate(${it.rot} ${it.x} ${it.y})"` : "";
+      return `<text x="${it.x}" y="${it.y}" fill="${c}" font-size="${size}"${rot}>${esc(it.text || "Texte")}</text>`;
     }
     return "";
   }).join("");
 
-  // Option vignette : fond quadrillé léger (comme l’éditeur)
   const showGrid = opts.grid ?? false;
   const grid = showGrid ? `
     <defs>
@@ -157,6 +211,11 @@ function diagramToSVG(model, opts = {}) {
     ${grid}
     ${els}
   </svg>`;
+}
+
+function diagramToDataUrl(model, opts = {}) {
+  const svg = diagramToSVG(model, opts);
+  return svg ? "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg) : "";
 }
 
 function diagramToDataUrl(model, opts = {}) {

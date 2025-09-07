@@ -653,3 +653,15 @@ svg .selected {
   gap: 8px;
   align-items: center
 }
+
+/* le fond du terrain / la grille ne doivent pas intercepter la souris */
+#editor-stage #grid-bg,
+#editor-stage .canvas-bg {
+  pointer-events: none;
+}
+
+/* les éléments interactifs DOIVENT capter */
+#editor-layer .draggable,
+#editor-layer .draggable * {
+  pointer-events: visiblePainted;
+}
