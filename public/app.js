@@ -961,7 +961,6 @@ function openExerciseDetails(item, opts = {}) {
   const modal = document.getElementById("exercise-details-modal");
   const btnClose = document.getElementById("exdet-close");
   const elTitle = document.getElementById("exdet-title");
-  const elNom = document.getElementById("exdet-nom");
   const elDesc = document.getElementById("exdet-desc");
   const elMat = document.getElementById("exdet-mat");
   const elDiag = document.getElementById("exdet-diagram");
@@ -972,8 +971,7 @@ function openExerciseDetails(item, opts = {}) {
   const mat = Array.isArray(item?.materiel) ? item.materiel : [];
   const diag = item?.diagram;
 
-  elTitle.textContent = "Détails de l’exercice";
-  elNom.textContent = nom;
+  elTitle.textContent = nom;
   elDesc.textContent = desc;
 
   // liste matériel
