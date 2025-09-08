@@ -19,30 +19,38 @@
 
   <!-- Planning (NOUVELLE UI: Calendrier + Détail) -->
   <section id="view-planning" class="view active">
-    <div class="cal-topbar">
-      <div class="cal-nav">
-        <button class="btn" id="cal-prev" aria-label="Mois précédent">‹</button>
-        <div class="cal-title" id="cal-title">Mois</div>
-        <button class="btn" id="cal-next" aria-label="Mois suivant">›</button>
+    <div class="calendar-selector">
+      <header class="calendar-header">
+        <h1 id="calendar-date"></h1>
+        <button id="calendar-toggle" class="calendar-toggle">Changer</button>
+      </header>
+      <div class="calendar-content" id="calendar-content">
+        <div class="cal-topbar">
+          <div class="cal-nav">
+            <button class="btn" id="cal-prev" aria-label="Mois précédent">‹</button>
+            <div class="cal-title" id="cal-title">Mois</div>
+            <button class="btn" id="cal-next" aria-label="Mois suivant">›</button>
+          </div>
+        </div>
+
+        <div class="cal-layout">
+          <div class="calendar" id="calendar">
+            <!-- en-têtes jours -->
+            <div class="cal-header">Lun</div>
+            <div class="cal-header">Mar</div>
+            <div class="cal-header">Mer</div>
+            <div class="cal-header">Jeu</div>
+            <div class="cal-header">Ven</div>
+            <div class="cal-header">Sam</div>
+            <div class="cal-header">Dim</div>
+            <!-- cellules du mois -> injectées par JS -->
+          </div>
+
+        </div>
       </div>
     </div>
-
-    <div class="cal-layout">
-      <div class="calendar" id="calendar">
-        <!-- en-têtes jours -->
-        <div class="cal-header">Lun</div>
-        <div class="cal-header">Mar</div>
-        <div class="cal-header">Mer</div>
-        <div class="cal-header">Jeu</div>
-        <div class="cal-header">Ven</div>
-        <div class="cal-header">Sam</div>
-        <div class="cal-header">Dim</div>
-        <!-- cellules du mois -> injectées par JS -->
-      </div>
-
-      <div class="day-pane">
-        <div id="day-pane-content"></div>
-      </div>
+    <div class="day-pane">
+      <div id="day-pane-content"></div>
     </div>
   </section>
 

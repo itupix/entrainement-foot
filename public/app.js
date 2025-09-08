@@ -65,6 +65,29 @@ async function updateDay(date, payload) {
 }
 
 // -----------------------
+// Sélection par défaut : prochain jour planifié
+// -----------------------
+function isoToUTCDate(iso) {
+  return new Date(iso + "T00:00:00Z");
+}
+function isPlannableCalendarItem(it) {
+  if (!it) return false;
+  if (it.cancelled && it.cancelled.is) return false;
+  // Jour d'entraînement par conception: mercredis et tous les samedis (entrainement, plateau ou libre)
+  return it.weekday === "mercredi" || it.weekday === "samedi";
+}
+function findNextPlannedDate(calendar, fromIso) {
+  const items = (calendar && Array.isArray(calendar.items)) ? calendar.items.slice() : [];
+  const planned = items.filter(isPlannableCalendarItem).sort((a, b) => a.date.localeCompare(b.date));
+  if (planned.length === 0) return null;
+  const fromTs = isoToUTCDate(fromIso).getTime();
+  const future = planned.find(d => isoToUTCDate(d.date).getTime() >= fromTs);
+  if (future) return future.date;
+  // sinon: aucun futur, on prend le dernier planifié (le plus récent passé)
+  return planned[planned.length - 1].date;
+}
+
+// -----------------------
 // Onglets
 // -----------------------
 function initTabs() {
@@ -547,22 +570,14 @@ function openNewExerciseInEditor(kind, id) {
   }
 }
 
+const h = document.getElementById("calendar-date");
+
 // -----------------------
 // Carte du jour (avec Mobilité)
 // -----------------------
 function renderDayCard(it, calendar, catalog, usages, rerenderAll) {
   const card = document.createElement("div");
   card.className = "card";
-
-  const h = document.createElement("h2");
-  const dateStr = new Date(it.date).toLocaleDateString("fr-FR", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  })
-  h.textContent = dateStr;
-  card.appendChild(h);
 
   // Annulé
   if (it.cancelled?.is) {
@@ -789,11 +804,13 @@ function renderCalendar(calendar, catalog, rerenderAll, state) {
 
   if (!state.selectedDate) {
     const today = todayIso();
+    const next = findNextPlannedDate(calendar, today);
     const inRange = (dIso) => {
       const d = new Date(dIso + "T00:00:00Z");
       return d >= first && d <= last;
     };
-    state.selectedDate = inRange(today) ? today : toIsoUTC(first);
+    // si le "prochain planifié" est dans le mois affiché on le prend, sinon on retombe sur le début du mois
+    state.selectedDate = (next && inRange(next)) ? next : (inRange(today) ? today : toIsoUTC(first));
   }
 
   Array.from(calendarEl.querySelectorAll(".cal-cell")).forEach((n) => n.remove());
@@ -852,6 +869,8 @@ function renderCalendar(calendar, catalog, rerenderAll, state) {
         p.textContent = "Aucune séance ce jour.";
         dayPane.appendChild(p);
       }
+      renderDate(state.selectedDate)
+      toggleCalendar()
     });
 
     calendarEl.appendChild(cell);
@@ -918,6 +937,17 @@ function openEditorForItem(kind, item, catalog, afterSave) {
   const m = document.getElementById("editor-modal");
   m.style.display = "flex";
   m.classList.add("show");
+}
+
+function renderDate(date) {
+  const dateStr = new Date(date).toLocaleDateString("fr-FR", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  }).replace(/./, c => c.toUpperCase())
+
+  h.textContent = dateStr;
 }
 
 // ---- Détails Exercice (lecture seule) ----
@@ -1132,6 +1162,12 @@ function renderExercisesList(catalog, category, calendar, rerenderAll) {
   }
 }
 
+const calToggle = document.getElementById('calendar-toggle')
+function toggleCalendar() {
+  calToggle.innerText = calToggle.innerText === "Fermer" ? "Changer" : "Fermer";
+  document.getElementById('calendar-content').classList.toggle('visible')
+}
+
 // -----------------------
 // Bootstrap
 // -----------------------
@@ -1158,10 +1194,15 @@ function renderExercisesList(catalog, category, calendar, rerenderAll) {
   const calendarRef = () => calendar;
   const catalogRef = () => catalog;
 
+  // Déterminer la date par défaut = prochain jour planifié (ou aujourd'hui si rien)
+  const __defaultIso = findNextPlannedDate(calendar, todayIso()) || todayIso();
+  const __d = new Date(__defaultIso + "T00:00:00Z");
   const state = {
-    currentYM: [new Date().getUTCFullYear(), new Date().getUTCMonth()],
-    selectedDate: null,
+    currentYM: [__d.getUTCFullYear(), __d.getUTCMonth()],
+    selectedDate: __defaultIso,
   };
+
+  renderDate(state.selectedDate)
 
   const rerenderAll = (newCalendar) => {
     if (newCalendar) calendar = newCalendar;
@@ -1188,8 +1229,7 @@ function renderExercisesList(catalog, category, calendar, rerenderAll) {
     renderExercisesList(catalog, cat, calendar, rerenderAll);
   });
 
-
-
+  calToggle.addEventListener('click', toggleCalendar)
 
   // Navigation mois
   const prevBtn = document.getElementById("cal-prev");
