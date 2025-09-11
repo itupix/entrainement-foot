@@ -14,6 +14,7 @@
     <nav class="tabs">
       <button class="tab active" data-target="view-planning">Planning</button>
       <button class="tab" data-target="view-exercices">Exercices</button>
+      <button class="tab" data-target="view-effectif">Effectif</button>
     </nav>
   </header>
 
@@ -73,6 +74,22 @@
     </div>
     <div id="ex-list" class="grid"></div>
   </section>
+
+  <div id="view-effectif" class="view">
+    <div class="card">
+      <h2>Effectif</h2>
+
+      <!-- Saisie -->
+      <div class="roster-form">
+        <input id="rf-first" placeholder="Prénom" />
+        <input id="rf-last" placeholder="Nom" />
+        <button class="btn" id="rf-add">Ajouter</button>
+      </div>
+
+      <!-- Liste -->
+      <div id="roster-list" class="roster-list"></div>
+    </div>
+  </div>
 
   <div id="editor-modal" class="modal" style="display:none;">
     <div class="modal-card modal-xl">

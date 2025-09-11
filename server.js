@@ -4,7 +4,7 @@ const express = require("express");
 const path = require("path");
 
 const { ensureTable, getJSON, setJSON, useFs } = require("./db");
-
+const { pool } = require("./db");
 // --- Bornes de saison ---
 const START_DATE = "2025-09-03";
 const END_DATE = "2026-07-01";
@@ -264,6 +264,56 @@ app.post("/api/day/:date", async (req, res) => {
   }
 });
 
+// -------- Players API --------
+
+// GET /api/players : liste complète
+app.get("/api/players", async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT id, first_name, last_name, created_at
+       FROM players
+       ORDER BY lower(first_name), lower(last_name)`
+    );
+    res.json({ players: rows });
+  } catch (e) {
+    console.error("[players] GET error:", e);
+    res.status(500).json({ error: "Erreur chargement effectif" });
+  }
+});
+
+// POST /api/players : créer
+// body: { first_name, last_name }
+app.post("/api/players", async (req, res) => {
+  try {
+    const fn = (req.body?.first_name || "").trim();
+    const ln = (req.body?.last_name || "").trim();
+    if (!fn || !ln) return res.status(400).json({ error: "Prénom et nom requis" });
+
+    const { rows } = await pool.query(
+      `INSERT INTO players (first_name, last_name)
+       VALUES ($1,$2)
+       RETURNING id, first_name, last_name, created_at`,
+      [fn, ln]
+    );
+    res.json({ player: rows[0] });
+  } catch (e) {
+    console.error("[players] POST error:", e);
+    res.status(500).json({ error: "Erreur création joueur/joueuse" });
+  }
+});
+
+// DELETE /api/players/:id : supprimer
+app.delete("/api/players/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    await pool.query(`DELETE FROM players WHERE id = $1`, [id]);
+    res.json({ ok: true });
+  } catch (e) {
+    console.error("[players] DELETE error:", e);
+    res.status(500).json({ error: "Erreur suppression" });
+  }
+});
+
 // Debug
 app.get("/api/debug/env", (_req, res) => {
   const raw = process.env.DATABASE_URL || null;
@@ -274,7 +324,7 @@ app.get("/api/debug/env", (_req, res) => {
 app.get("/api/debug/db", async (_req, res) => {
   try {
     if (useFs) return res.json({ ok: true, mode: "fs" });
-    const { pool } = require("./db");
+
     const r = await pool.query("select now() as now");
     res.json({ ok: true, mode: "pg", now: r.rows[0].now });
   } catch (e) {

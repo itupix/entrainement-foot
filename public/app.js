@@ -24,6 +24,153 @@ function makeDetailsButton(item) {
   return btn;
 }
 
+function capitalize(s) { return s ? s.slice(0, 1).toUpperCase() + s.slice(1) : ""; }
+
+// Retourne un tableau de { id, display, full } où display suit la règle : "Prénom N." (ou plus de lettres si prénoms identiques)
+function computeRosterDisplay(players) {
+  const byFirst = new Map();
+  players.forEach(p => {
+    const key = (p.first_name || "").trim().toLowerCase();
+    if (!byFirst.has(key)) byFirst.set(key, []);
+    byFirst.get(key).push(p);
+  });
+
+  const out = [];
+  for (const group of byFirst.values()) {
+    if (group.length === 1) {
+      const p = group[0];
+      const dn = `${capitalize(p.first_name)} ${capitalize(p.last_name).slice(0, 1)}.`;
+      out.push({ id: p.id, display: dn, full: `${capitalize(p.first_name)} ${capitalize(p.last_name)}` });
+      continue;
+    }
+    // Plusieurs joueurs avec le même prénom : on étend la longueur de l'initiale jusqu'à unicité
+    const lastNames = group.map(p => (p.last_name || "").trim());
+    const maxLen = Math.max(...lastNames.map(s => s.length));
+    let k = 1;
+    while (k <= maxLen) {
+      const seen = new Set();
+      const collision = group.some(p => {
+        const key = (p.last_name || "").slice(0, k).toLowerCase();
+        const dup = seen.has(key);
+        seen.add(key);
+        return dup;
+      });
+      if (!collision) break;
+      k++;
+    }
+    // construire les affichages
+    const seen2 = new Map();
+    group.forEach(p => {
+      const base = (p.last_name || "");
+      let prefix = capitalize(base).slice(0, Math.max(1, k));
+      if (!prefix) prefix = "";
+      let label = `${capitalize(p.first_name)} ${prefix}${prefix ? "." : ""}`;
+      // si même prénom ET même préfixe (même nom), suffixer un compteur
+      const skey = `${p.first_name.toLowerCase()}|${prefix.toLowerCase()}`;
+      const num = (seen2.get(skey) || 0) + 1;
+      seen2.set(skey, num);
+      if (num > 1) label = `${label}${num}`;
+      out.push({ id: p.id, display: label, full: `${capitalize(p.first_name)} ${capitalize(p.last_name)}` });
+    });
+  }
+  // conserver l'ordre d'entrée
+  const order = new Map(players.map((p, i) => [p.id, i]));
+  out.sort((a, b) => (order.get(a.id) - order.get(b.id)));
+  return out;
+}
+
+async function loadPlayers() {
+  const r = await fetch("/api/players", { cache: "no-store" });
+  if (!r.ok) throw new Error("Erreur chargement effectif");
+  const j = await r.json();
+  return j.players || [];
+}
+
+async function addPlayer(first_name, last_name) {
+  const r = await fetch("/api/players", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ first_name, last_name })
+  });
+  if (!r.ok) {
+    const j = await r.json().catch(() => ({}));
+    throw new Error(j.error || "Erreur ajout");
+  }
+  return (await r.json()).player;
+}
+
+async function deletePlayer(id) {
+  const r = await fetch(`/api/players/${id}`, { method: "DELETE" });
+  if (!r.ok) {
+    const j = await r.json().catch(() => ({}));
+    throw new Error(j.error || "Erreur suppression");
+  }
+  return true;
+}
+
+function renderRosterList(players) {
+  const list = document.getElementById("roster-list");
+  if (!list) return;
+  list.innerHTML = "";
+
+  const display = computeRosterDisplay(players);
+  const map = new Map(players.map(p => [p.id, p]));
+
+  display.forEach(d => {
+    const p = map.get(d.id);
+    const row = document.createElement("div");
+    row.className = "roster-item";
+
+    const left = document.createElement("div");
+    left.innerHTML = `<div class="roster-name">${d.display}</div>
+                      <div class="roster-meta">${d.full}</div>`;
+    const right = document.createElement("div");
+
+    const del = document.createElement("button");
+    del.className = "btn danger";
+    del.textContent = "Suppr.";
+    del.onclick = async () => {
+      if (!confirm(`Supprimer ${d.full} ?`)) return;
+      try {
+        await deletePlayer(d.id);
+        const refreshed = await loadPlayers();
+        renderRosterList(refreshed);
+      } catch (e) { alert(e.message); }
+    };
+
+    right.appendChild(del);
+    row.appendChild(left);
+    row.appendChild(right);
+    list.appendChild(row);
+  });
+
+  if (players.length === 0) {
+    const p = document.createElement("p");
+    p.textContent = "Aucun joueur/joueuse pour le moment.";
+    p.style.color = "#6b7280";
+    list.appendChild(p);
+  }
+}
+
+function wireRosterForm() {
+  const iF = document.getElementById("rf-first");
+  const iL = document.getElementById("rf-last");
+  const btn = document.getElementById("rf-add");
+  if (!iF || !iL || !btn) return;
+
+  btn.onclick = async () => {
+    const fn = (iF.value || "").trim();
+    const ln = (iL.value || "").trim();
+    if (!fn || !ln) return alert("Prénom et nom requis");
+    try {
+      await addPlayer(fn, ln);
+      iF.value = ""; iL.value = "";
+      const refreshed = await loadPlayers();
+      renderRosterList(refreshed);
+    } catch (e) { alert(e.message); }
+  };
+}
+
 function countUsages(calendar) {
   const usages = { jeux: {}, entr: {}, mob: {} };
   if (!calendar || !Array.isArray(calendar.items)) return usages;
@@ -1271,6 +1418,22 @@ function toggleCalendar() {
 // -----------------------
 (async function () {
   initTabs();
+
+
+  let roster = [];
+  async function refreshRoster() {
+    try { roster = await loadPlayers(); renderRosterList(roster); }
+    catch (e) { console.warn("Effectif: ", e.message); }
+  }
+
+  // Quand on clique l’onglet Effectif, on (re)charge
+  document.querySelector('.tab[data-target="view-effectif"]')?.addEventListener("click", refreshRoster);
+
+  // Premier wiring du formulaire
+  wireRosterForm();
+
+  // Optionnel: charger immédiatement une première fois
+  refreshRoster();
 
   const [calRes, catRes] = await Promise.allSettled([
     fetch("/api/calendar"),
