@@ -856,3 +856,46 @@ svg .selected {
   color: #6b7280;
   font-size: 12px
 }
+
+.att-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 8px;
+  background: #fff
+}
+
+.att-left {
+  display: flex;
+  flex-direction: column
+}
+
+.att-name {
+  font-weight: 600
+}
+
+.att-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center
+}
+
+.att-actions .seg input {
+  display: none
+}
+
+.att-actions .seg label {
+  border: 1px solid #d1d5db;
+  padding: 4px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px
+}
+
+.att-actions .seg input:checked+label {
+  background: #111827;
+  color: #fff;
+  border-color: #111827
+}

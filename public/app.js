@@ -24,6 +24,148 @@ function makeDetailsButton(item) {
   return btn;
 }
 
+async function fetchAttendance(dateIso) {
+  const r = await fetch(`/api/attendance/${dateIso}`, { cache: "no-store" });
+  if (!r.ok) throw new Error("Erreur chargement présences");
+  return (await r.json()).items || [];
+}
+
+async function saveAttendance(dateIso, statuses, notes) {
+  const r = await fetch(`/api/attendance/${dateIso}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ statuses, notes })
+  });
+  if (!r.ok) {
+    const j = await r.json().catch(() => ({}));
+    throw new Error(j.error || "Erreur enregistrement présences");
+  }
+  return (await r.json());
+}
+
+function ensureAttendanceDom() {
+  // HTML déjà inclus
+}
+
+function openAttendanceModal(dateIso, players) {
+  ensureAttendanceDom();
+
+  const modal = document.getElementById("attendance-modal");
+  const btnClose = document.getElementById("att-close");
+  const btnSave = document.getElementById("att-save");
+  const title = document.getElementById("att-title");
+  const list = document.getElementById("att-list");
+  const search = document.getElementById("att-search");
+  const counters = document.getElementById("att-counters");
+
+  const display = computeRosterDisplay(players); // tu l’as déjà en place
+  const mapP = new Map(players.map(p => [p.id, p]));
+
+  let state = {
+    statuses: {}, // player_id -> "present"|"absent"|"excuse"
+    notes: {},    // player_id -> string
+    filteredIds: display.map(d => d.id)
+  };
+
+  title.textContent = `Présences — ${dateIso}`;
+
+  function recomputeCounters() {
+    const vals = Object.values(state.statuses);
+    const present = vals.filter(v => v === "present").length;
+    const absent = vals.filter(v => v === "absent").length;
+    const excuse = vals.filter(v => v === "excuse").length;
+    counters.textContent = `Présents: ${present} · Absents: ${absent} · Excusés: ${excuse}`;
+  }
+
+  function render() {
+    list.innerHTML = "";
+    const dispMap = new Map(display.map(d => [d.id, d]));
+    state.filteredIds.forEach(id => {
+      const d = dispMap.get(id);
+      const full = mapP.get(id);
+      const cur = state.statuses[id] || "";
+
+      const row = document.createElement("div");
+      row.className = "att-row";
+
+      const left = document.createElement("div");
+      left.className = "att-left";
+      left.innerHTML = `<div class="att-name">${d.display}</div><div class="roster-meta">${d.full}</div>`;
+
+      const right = document.createElement("div");
+      right.className = "att-actions";
+
+      // segment radios
+      const seg = document.createElement("div");
+      seg.className = "seg";
+      ["present", "absent", "excuse"].forEach(val => {
+        const idInput = `att_${id}_${val}`;
+        const inp = document.createElement("input");
+        inp.type = "radio"; inp.name = `att_${id}`; inp.id = idInput; inp.checked = (cur === val);
+        inp.onchange = () => { state.statuses[id] = val; recomputeCounters(); };
+        const lab = document.createElement("label");
+        lab.htmlFor = idInput;
+        lab.textContent = (val === "present" ? "Présent" : val === "absent" ? "Absent" : "Excusé");
+        seg.appendChild(inp); seg.appendChild(lab);
+      });
+
+      // note (facultatif)
+      const note = document.createElement("input");
+      note.placeholder = "Note (facultatif)";
+      note.value = state.notes[id] || "";
+      note.oninput = (e) => { state.notes[id] = e.target.value; };
+
+      right.appendChild(seg);
+      right.appendChild(note);
+
+      row.appendChild(left);
+      row.appendChild(right);
+      list.appendChild(row);
+    });
+    recomputeCounters();
+  }
+
+  function applySearch(q) {
+    const ql = q.trim().toLowerCase();
+    if (!ql) { state.filteredIds = display.map(d => d.id); render(); return; }
+    state.filteredIds = display
+      .filter(d => d.display.toLowerCase().includes(ql) || d.full.toLowerCase().includes(ql))
+      .map(d => d.id);
+    render();
+  }
+
+  // Charger présences existantes
+  (async () => {
+    try {
+      const items = await fetchAttendance(dateIso);
+      items.forEach(it => {
+        state.statuses[it.player_id] = it.status;
+        if (it.note) state.notes[it.player_id] = it.note;
+      });
+      render();
+    } catch (e) {
+      console.warn("attendance load:", e.message);
+      render(); // rendu “vide” si pas de data
+    }
+  })();
+
+  // events
+  function close() { modal.classList.remove("show"); modal.style.display = "none"; }
+  btnClose.onclick = close;
+  modal.addEventListener("click", (ev) => { if (ev.target === modal) close(); });
+  btnSave.onclick = async () => {
+    try {
+      await saveAttendance(dateIso, state.statuses, state.notes);
+      close();
+    } catch (e) { alert(e.message); }
+  };
+  search.oninput = () => applySearch(search.value);
+
+  // open
+  modal.style.display = "flex";
+  modal.classList.add("show");
+}
+
 function capitalize(s) { return s ? s.slice(0, 1).toUpperCase() + s.slice(1) : ""; }
 
 // Retourne un tableau de { id, display, full } où display suit la règle : "Prénom N." (ou plus de lettres si prénoms identiques)
@@ -976,6 +1118,26 @@ function renderDayCard(it, calendar, catalog, usages, rerenderAll) {
     <h3>Match</h3>
 `;
   card.appendChild(match);
+
+  const bar = document.createElement("div");
+  bar.style.display = "flex";
+  bar.style.justifyContent = "flex-end";
+  bar.style.gap = "8px";
+  bar.style.marginBottom = "8px";
+
+  const btnAtt = document.createElement("button");
+  btnAtt.className = "btn";
+  btnAtt.textContent = "Présences";
+  btnAtt.onclick = async () => {
+    try {
+      // charge les joueurs puis ouvre la modale
+      const players = await loadPlayers(); // tu l'as déjà côté effectif
+      openAttendanceModal(it.date, players);
+    } catch (e) { alert(e.message); }
+  };
+
+  bar.appendChild(btnAtt);
+  card.prepend(bar);
 
   return card;
 }

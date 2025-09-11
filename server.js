@@ -314,6 +314,62 @@ app.delete("/api/players/:id", async (req, res) => {
   }
 });
 
+// GET /api/attendance/:date  -> liste des statuts pour la date
+app.get("/api/attendance/:date", async (req, res) => {
+  const dateStr = req.params.date; // "YYYY-MM-DD"
+  try {
+    const { rows } = await pool.query(
+      `SELECT a.player_id, a.status, a.note, p.first_name, p.last_name
+       FROM attendance a
+       JOIN players p ON p.id = a.player_id
+       WHERE a.date = $1
+       ORDER BY lower(p.first_name), lower(p.last_name)`,
+      [dateStr]
+    );
+    res.json({ date: dateStr, items: rows });
+  } catch (e) {
+    console.error("[attendance] GET", e);
+    res.status(500).json({ error: "Erreur chargement présences" });
+  }
+});
+
+// POST /api/attendance/:date  -> upsert des statuts envoyés
+// body: { statuses: { "<player_id>": "present"|"absent"|"excuse" }, notes?: { "<player_id>": "..." } }
+app.post("/api/attendance/:date", async (req, res) => {
+  const dateStr = req.params.date;
+  const statuses = req.body?.statuses || {};
+  const notes = req.body?.notes || {};
+  const ids = Object.keys(statuses);
+  if (ids.length === 0) return res.json({ ok: true, updated: 0 });
+
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    let updated = 0;
+    for (const pid of ids) {
+      const st = statuses[pid];
+      if (!["present", "absent", "excuse"].includes(st)) continue;
+      const note = notes[pid] ?? null;
+      await client.query(
+        `INSERT INTO attendance(date, player_id, status, note)
+         VALUES ($1,$2,$3,$4)
+         ON CONFLICT (date, player_id)
+         DO UPDATE SET status = EXCLUDED.status, note = EXCLUDED.note, updated_at = now()`,
+        [dateStr, pid, st, note]
+      );
+      updated++;
+    }
+    await client.query("COMMIT");
+    res.json({ ok: true, updated });
+  } catch (e) {
+    await client.query("ROLLBACK");
+    console.error("[attendance] POST", e);
+    res.status(500).json({ error: "Erreur enregistrement présences" });
+  } finally {
+    client.release();
+  }
+});
+
 // Debug
 app.get("/api/debug/env", (_req, res) => {
   const raw = process.env.DATABASE_URL || null;
