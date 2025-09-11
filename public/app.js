@@ -589,21 +589,121 @@ function renderDayCard(it, calendar, catalog, usages, rerenderAll) {
 
   const isTraining = (it.weekday === "mercredi") || (it.weekday === "samedi" && it.type === "entrainement");
 
+  // --- Contrôles 'samedi' quand on est en mode entraînement ---
+  if (isTraining && it.weekday === "samedi") {
+    const saturdayBar = document.createElement("div");
+    saturdayBar.style.display = "flex";
+    saturdayBar.style.gap = "8px";
+    saturdayBar.style.marginBottom = "8px";
+
+    const info = document.createElement("div");
+    info.className = "pill";
+    info.textContent = "Samedi — Entraînement";
+    saturdayBar.appendChild(info);
+
+    const btnToPlateau = document.createElement("button");
+    btnToPlateau.className = "btn";
+    btnToPlateau.textContent = "Basculer en plateau…";
+    btnToPlateau.onclick = async () => {
+      const lieu = prompt("Lieu du plateau :", it.plateauLieu || "");
+      if (lieu === null) return;
+      try {
+        const { calendar: cal } = await updateDay(it.date, { type: "plateau", plateauLieu: (lieu || "").trim() });
+        rerenderAll(cal);
+      } catch (e) { alert(e.message); }
+    };
+    saturdayBar.appendChild(btnToPlateau);
+
+    const btnToLibre = document.createElement("button");
+    btnToLibre.className = "btn";
+    btnToLibre.textContent = "Basculer en libre";
+    btnToLibre.onclick = async () => {
+      if (!confirm("Basculer ce samedi en 'libre' ? Le plan de séance sera vidé.")) return;
+      try {
+        const { calendar: cal } = await updateDay(it.date, { type: "libre" });
+        rerenderAll(cal);
+      } catch (e) { alert(e.message); }
+    };
+    saturdayBar.appendChild(btnToLibre);
+
+    card.appendChild(saturdayBar);
+  }
+
   if (!isTraining) {
     const p = document.createElement("p");
-    p.textContent = it.weekday === "samedi" ? `Samedi: ${it.type || "libre"} ` : "Aucune séance";
+    p.textContent = it.weekday === "samedi" ? `Samedi : ${it.type || "libre"}` : "Aucune séance";
     card.appendChild(p);
 
     if (it.weekday === "samedi") {
-      const btn = document.createElement("button");
-      btn.className = "btn";
-      btn.textContent = "Basculer en entraînement";
-      btn.onclick = async () => {
+      // Détails 'plateau' (lieu + édition)
+      if (it.type === "plateau") {
+        const loc = document.createElement("p");
+        loc.innerHTML = `Lieu du plateau : <strong>${it.plateauLieu || "—"}</strong>`;
+        card.appendChild(loc);
+
+        const row = document.createElement("div");
+        row.style.display = "flex";
+        row.style.gap = "8px";
+        row.style.marginTop = "6px";
+
+        const btnLieu = document.createElement("button");
+        btnLieu.className = "btn";
+        btnLieu.textContent = "Modifier le lieu";
+        btnLieu.onclick = async () => {
+          const nv = prompt("Nouveau lieu du plateau :", it.plateauLieu || "");
+          if (nv === null) return;
+          try {
+            const { calendar: cal } = await updateDay(it.date, { type: "plateau", plateauLieu: (nv || "").trim() });
+            rerenderAll(cal);
+          } catch (e) { alert(e.message); }
+        };
+        row.appendChild(btnLieu);
+
+        card.appendChild(row);
+      }
+
+      // Actions de bascule (entrainement / plateau / libre)
+      const actions = document.createElement("div");
+      actions.style.display = "flex";
+      actions.style.gap = "8px";
+      actions.style.marginTop = "8px";
+
+      const btnToTraining = document.createElement("button");
+      btnToTraining.className = "btn";
+      btnToTraining.textContent = "Basculer en entraînement";
+      btnToTraining.onclick = async () => {
         try { const { calendar: cal } = await updateDay(it.date, { type: "entrainement" }); rerenderAll(cal); }
         catch (e) { alert(e.message); }
       };
-      card.appendChild(btn);
+      actions.appendChild(btnToTraining);
+
+      const btnToPlateau = document.createElement("button");
+      btnToPlateau.className = "btn";
+      btnToPlateau.textContent = "Basculer en plateau…";
+      btnToPlateau.onclick = async () => {
+        const lieu = prompt("Lieu du plateau :", it.plateauLieu || "");
+        if (lieu === null) return;
+        try {
+          const { calendar: cal } = await updateDay(it.date, { type: "plateau", plateauLieu: (lieu || "").trim() });
+          rerenderAll(cal);
+        } catch (e) { alert(e.message); }
+      };
+      actions.appendChild(btnToPlateau);
+
+      const btnToLibre = document.createElement("button");
+      btnToLibre.className = "btn";
+      btnToLibre.textContent = "Basculer en libre";
+      btnToLibre.onclick = async () => {
+        try {
+          const { calendar: cal } = await updateDay(it.date, { type: "libre" });
+          rerenderAll(cal);
+        } catch (e) { alert(e.message); }
+      };
+      actions.appendChild(btnToLibre);
+
+      card.appendChild(actions);
     }
+
     return card;
   }
 
