@@ -1,6 +1,8 @@
 // server.js
 require("dotenv").config();
 const express = require("express");
+const app = express();
+app.use(express.json());
 const path = require("path");
 
 const { ensureTable, getJSON, setJSON, useFs } = require("./db");
@@ -181,10 +183,6 @@ function updateDay(calendar, catalog, dateStr, { jeuId, entrainementId, mobilite
   return day;
 }
 
-// --- App ---
-const app = express();
-app.use(express.json({ limit: "1mb" }));
-
 app.use((req, res, next) => {
   if (req.path.startsWith("/api/catalog") || req.path.startsWith("/api/calendar")) {
     res.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
@@ -256,7 +254,40 @@ app.post("/api/day/:date", async (req, res) => {
     const catalog = await getJSON("catalog");
     if (!catalog) return res.status(400).json({ ok: false, error: "catalog absent" });
 
-    updateDay(calendar, catalog, dateStr, req.body || {});
+    const body = req.body || {};
+    const day = findDay(calendar, dateStr);
+    if (!day) return res.status(400).json({ ok: false, error: "jour inconnu" });
+
+    // 1) Matches d'abord : upsert / delete / rétrocompat
+    if (body.matchUpsert) {
+      const m = body.matchUpsert;
+      if (!day.matches) day.matches = [];
+      const idx = day.matches.findIndex(x => x.id === m.id);
+      if (idx === -1) day.matches.push(m);
+      else day.matches[idx] = m;
+    }
+    if (body.matchDeleteId) {
+      if (day.matches) {
+        day.matches = day.matches.filter(x => x.id !== body.matchDeleteId);
+      }
+    }
+    if (body.match) { // rétrocompat: un seul match -> on le normalise en tableau
+      if (!day.matches) day.matches = [];
+      const m = body.match.id ? body.match : { ...body.match, id: `m_${Date.now()}` };
+      const idx = day.matches.findIndex(x => x.id === m.id);
+      if (idx === -1) day.matches.push(m);
+      else day.matches[idx] = m;
+      delete day.match;
+    }
+
+    // 2) Appeler updateDay UNIQUEMENT si on modifie la planification
+    const hasScheduleKeys = ["jeuId", "entrainementId", "mobiliteId", "type", "plateauLieu", "cancelled"]
+      .some(k => Object.prototype.hasOwnProperty.call(body, k));
+
+    if (hasScheduleKeys) {
+      updateDay(calendar, catalog, dateStr, body);
+    }
+
     await setJSON("calendar", calendar);
     res.json({ ok: true, calendar });
   } catch (e) {

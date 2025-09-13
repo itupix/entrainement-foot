@@ -47,7 +47,7 @@ function ensureAttendanceDom() {
   // HTML déjà inclus
 }
 
-function openAttendanceModal(dateIso, players) {
+function openAttendanceModal(dateIso, players, onSaved) {
   ensureAttendanceDom();
 
   const modal = document.getElementById("attendance-modal");
@@ -156,6 +156,7 @@ function openAttendanceModal(dateIso, players) {
   btnSave.onclick = async () => {
     try {
       await saveAttendance(dateIso, state.statuses, state.notes);
+      if (typeof onSaved === "function") onSaved();
       close();
     } catch (e) { alert(e.message); }
   };
@@ -166,7 +167,420 @@ function openAttendanceModal(dateIso, players) {
   modal.classList.add("show");
 }
 
+function makeAttendanceBar(dateIso, afterUpdate) {
+  const bar = document.createElement("div");
+  bar.style.display = "flex";
+  bar.style.justifyContent = "space-between";
+  bar.style.alignItems = "center";
+  bar.style.gap = "8px";
+  bar.style.marginBottom = "8px";
+
+  const pill = document.createElement("div");
+  pill.className = "pill";
+  pill.textContent = "Présences: —";
+  bar.appendChild(pill);
+
+  const btn = document.createElement("button");
+  btn.className = "btn";
+  btn.textContent = "Présences";
+  btn.onclick = async () => {
+    try {
+      const players = await __loadPlayersSafe();
+      if (typeof openAttendanceModal === "function") {
+        openAttendanceModal(dateIso, players, async () => {
+          // après sauvegarde, rafraîchir le résumé
+          try {
+            const items = await fetchAttendance(dateIso);
+            const present = items.filter(i => i.status === "present").length;
+            const absent = items.filter(i => i.status === "absent").length;
+            const excuse = items.filter(i => i.status === "excuse").length;
+            pill.textContent = `Présences: ${present} · Absents: ${absent} · Excusés: ${excuse}`;
+            if (typeof afterUpdate === "function") afterUpdate();
+          } catch (e) { /* silencieux */ }
+        });
+      } else {
+        alert("Modale de présences indisponible.");
+      }
+    } catch (e) { alert(e.message); }
+  };
+  bar.appendChild(btn);
+
+  // premier remplissage du résumé
+  (async () => {
+    try {
+      const items = await fetchAttendance(dateIso);
+      const present = items.filter(i => i.status === "present").length;
+      const absent = items.filter(i => i.status === "absent").length;
+      const excuse = items.filter(i => i.status === "excuse").length;
+      pill.textContent = `Présences: ${present} · Absents: ${absent} · Excusés: ${excuse}`;
+    } catch (e) { /* pas grave si vide */ }
+  })();
+
+  return bar;
+}
+
 function capitalize(s) { return s ? s.slice(0, 1).toUpperCase() + s.slice(1) : ""; }
+
+// Générateur d'IDs uniques courts (pour matchs etc.)
+function uid(prefix = 'm_') {
+  return prefix + Math.random().toString(36).slice(2, 8) + Date.now().toString(36).slice(-4);
+}
+
+// -----------------------
+// Match: Modal + helpers (entrainement & plateau)
+// -----------------------
+function ensureMatchDom() {
+  if (document.getElementById("match-modal")) return;
+  const el = document.createElement("div");
+  el.innerHTML = `
+  <div class="modal" id="match-modal" style="display:none;">
+    <div class="modal-card" style="max-width:920px;width:96%;max-height:92vh;display:flex;flex-direction:column;">
+      <div class="modal-head" style="display:flex;gap:8px;align-items:center;justify-content:space-between;">
+        <h3 id="match-title" style="margin:0;">Match</h3>
+        <button class="btn" id="match-close">Fermer</button>
+      </div>
+      <div id="match-body" style="display:flex;gap:12px;flex-wrap:wrap;">
+        <!-- Left: config -->
+        <div style="flex:1 1 340px;min-width:320px;">
+          <div id="match-kind-info" class="pill" style="margin-bottom:8px;">Match</div>
+          <div id="match-plateau-row" style="display:none;gap:6px;align-items:center;margin:6px 0;">
+            <label style="min-width:90px;">Adversaire</label>
+            <input id="match-opponent" placeholder="Nom de l'adversaire" style="flex:1;" />
+          </div>
+          <div style="display:flex;gap:8px;margin:8px 0;">
+            <div style="flex:1;">
+              <label>Score A / Nous</label>
+              <input id="match-score-left" type="number" min="0" value="0" />
+            </div>
+            <div style="flex:1;">
+              <label>Score B / Eux</label>
+              <input id="match-score-right" type="number" min="0" value="0" />
+            </div>
+          </div>
+          <div style="margin-top:8px;">
+            <h4 style="margin:6px 0;">Buteurs</h4>
+            <div id="match-scorers-list" style="display:flex;flex-direction:column;gap:6px;"></div>
+            <div style="display:flex;gap:6px;align-items:center;margin-top:6px;">
+              <select id="match-scorer-player" style="flex:1;"></select>
+              <select id="match-scorer-team" style="width:120px;"><option value="A">Équipe A/Nous</option><option value="B">Équipe B/Eux</option></select>
+              <input id="match-scorer-minute" type="number" min="0" placeholder="Min" style="width:90px;"/>
+              <button class="btn" id="match-add-scorer">Ajouter</button>
+            </div>
+          </div>
+        </div>
+        <!-- Right: squads -->
+        <div style="flex:1 1 460px;min-width:340px;">
+          <h4 style="margin:6px 0;">Effectifs</h4>
+          <div id="match-squads" style="display:grid;grid-template-columns:repeat(2,minmax(160px,1fr));gap:8px;"></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;">
+        <button class="btn" id="match-save">Enregistrer</button>
+      </div>
+    </div>
+  </div>`;
+  document.body.appendChild(el.firstElementChild);
+}
+
+function summarizeName(p) {
+  return `${capitalize(p.first_name)} ${capitalize(p.last_name).slice(0, 1)}.`;
+}
+
+function openMatchModal(dateIso, dayItem, players, onSaved, existingModel) {
+  ensureMatchDom();
+  const modal = document.getElementById("match-modal");
+  const closeBtn = document.getElementById("match-close");
+  const title = document.getElementById("match-title");
+  const kindInfo = document.getElementById("match-kind-info");
+  const plateauRow = document.getElementById("match-plateau-row");
+  const inpOpp = document.getElementById("match-opponent");
+  const scoreL = document.getElementById("match-score-left");
+  const scoreR = document.getElementById("match-score-right");
+  const squads = document.getElementById("match-squads");
+  const scorersList = document.getElementById("match-scorers-list");
+  const selScorer = document.getElementById("match-scorer-player");
+  const selTeam = document.getElementById("match-scorer-team");
+  const inpMinute = document.getElementById("match-scorer-minute");
+  const btnAddScorer = document.getElementById("match-add-scorer");
+  const btnSave = document.getElementById("match-save");
+
+  const isTraining = (dayItem.weekday === "mercredi") || (dayItem.weekday === "samedi" && dayItem.type === "entrainement");
+  const isPlateau = (dayItem.weekday === "samedi" && dayItem.type === "plateau");
+
+  title.textContent = `Match — ${dateIso}`;
+  kindInfo.textContent = isTraining ? "Match d'entraînement (A vs B)" : (isPlateau ? "Match de plateau (Nous vs Adversaire)" : "Match");
+  plateauRow.style.display = isPlateau ? "flex" : "none";
+
+  // seed model from existingModel if provided, else fallback to dayItem.match
+  let model = existingModel ? JSON.parse(JSON.stringify(existingModel))
+    : (dayItem.match && typeof dayItem.match === 'object' ? JSON.parse(JSON.stringify(dayItem.match)) : null);
+  if (!model) {
+    model = isTraining ? {
+      kind: 'training',
+      teamA: { starters: [], subs: [], score: 0 },
+      teamB: { starters: [], subs: [], score: 0 },
+      scorers: []
+    } : {
+      kind: 'plateau',
+      opponent: dayItem.plateauLieu || '',
+      our: { starters: [], subs: [] },
+      score: { us: 0, them: 0 },
+      scorers: []
+    };
+  }
+
+  // fill score + opponent
+  if (isTraining) {
+    scoreL.value = Number(model.teamA?.score || 0);
+    scoreR.value = Number(model.teamB?.score || 0);
+    selTeam.innerHTML = `<option value="A">Équipe A</option><option value="B">Équipe B</option>`;
+  } else {
+    scoreL.value = Number(model.score?.us || 0);
+    scoreR.value = Number(model.score?.them || 0);
+    selTeam.innerHTML = `<option value="A">Nous</option><option value="B">Eux</option>`;
+    inpOpp.value = model.opponent || dayItem.opponent || '';
+  }
+
+  // populate player select
+  selScorer.innerHTML = players.map(p => `<option value="${p.id}">${summarizeName(p)}</option>`).join("");
+
+  function renderScorers() {
+    scorersList.innerHTML = "";
+    const arr = Array.isArray(model.scorers) ? model.scorers : [];
+    if (!arr.length) {
+      const p = document.createElement('div');
+      p.textContent = "Aucun buteur";
+      p.style.color = '#6b7280';
+      scorersList.appendChild(p);
+      return;
+    }
+    arr.forEach((s, idx) => {
+      const row = document.createElement('div');
+      row.className = 'att-row';
+      const left = document.createElement('div');
+      left.className = 'att-left';
+      const p = players.find(pp => pp.id === s.player_id);
+      const who = p ? summarizeName(p) : s.player_id;
+      left.innerHTML = `<div class="att-name">${who}</div><div class="roster-meta">${s.team === 'A' ? 'A/Nous' : 'B/Eux'} ${s.minute != null ? `· ${s.minute}\'` : ''}</div>`;
+      const right = document.createElement('div');
+      const del = document.createElement('button'); del.className = 'btn danger'; del.textContent = 'Suppr.';
+      del.onclick = () => { model.scorers.splice(idx, 1); renderScorers(); };
+      right.appendChild(del);
+      row.appendChild(left); row.appendChild(right);
+      scorersList.appendChild(row);
+    });
+  }
+
+  function squadBox(title, list, onToggle) {
+    const box = document.createElement('div');
+    box.className = 'card';
+    const h = document.createElement('h4'); h.textContent = title; h.style.marginTop = '0';
+    box.appendChild(h);
+    const wrap = document.createElement('div'); wrap.style.display = 'flex'; wrap.style.flexDirection = 'column'; wrap.style.gap = '6px';
+    players.forEach(p => {
+      const id = `sq_${title}_${p.id}`;
+      const line = document.createElement('label'); line.style.display = 'flex'; line.style.alignItems = 'center'; line.style.gap = '6px';
+      const cb = document.createElement('input'); cb.type = 'checkbox'; cb.id = id; cb.checked = list.includes(p.id);
+      cb.onchange = () => onToggle(p.id, cb.checked);
+      const span = document.createElement('span'); span.textContent = summarizeName(p);
+      line.appendChild(cb); line.appendChild(span);
+      wrap.appendChild(line);
+    });
+    box.appendChild(wrap);
+    return box;
+  }
+
+  // render squads
+  squads.innerHTML = '';
+  if (isTraining) {
+    const aStar = model.teamA.starters || [], aSubs = model.teamA.subs || [];
+    const bStar = model.teamB.starters || [], bSubs = model.teamB.subs || [];
+    squads.appendChild(squadBox('A - Titulaires', aStar, (pid, on) => { toggleList(aStar, pid, on); model.teamA.starters = aStar; }));
+    squads.appendChild(squadBox('A - Remplaçants', aSubs, (pid, on) => { toggleList(aSubs, pid, on); model.teamA.subs = aSubs; }));
+    squads.appendChild(squadBox('B - Titulaires', bStar, (pid, on) => { toggleList(bStar, pid, on); model.teamB.starters = bStar; }));
+    squads.appendChild(squadBox('B - Remplaçants', bSubs, (pid, on) => { toggleList(bSubs, pid, on); model.teamB.subs = bSubs; }));
+  } else {
+    const ourStar = model.our.starters || [], ourSubs = model.our.subs || [];
+    squads.appendChild(squadBox('Nous - Titulaires', ourStar, (pid, on) => { toggleList(ourStar, pid, on); model.our.starters = ourStar; }));
+    squads.appendChild(squadBox('Nous - Remplaçants', ourSubs, (pid, on) => { toggleList(ourSubs, pid, on); model.our.subs = ourSubs; }));
+  }
+
+  function toggleList(arr, id, on) {
+    const idx = arr.indexOf(id);
+    if (on && idx === -1) arr.push(id);
+    if (!on && idx !== -1) arr.splice(idx, 1);
+  }
+
+  btnAddScorer.onclick = () => {
+    const pid = selScorer.value;
+    const team = selTeam.value === 'B' ? 'B' : 'A';
+    const minute = inpMinute.value ? parseInt(inpMinute.value, 10) : null;
+    if (!pid) return;
+    model.scorers.push({ player_id: pid, team, minute });
+    renderScorers();
+    inpMinute.value = '';
+  };
+
+  renderScorers();
+
+  // save
+  btnSave.onclick = async () => {
+    try {
+      if (!model.id) model.id = uid();
+      if (isTraining) {
+        model.kind = 'training';
+        model.teamA.score = parseInt(scoreL.value || '0', 10) || 0;
+        model.teamB.score = parseInt(scoreR.value || '0', 10) || 0;
+      } else {
+        model.kind = 'plateau';
+        model.score.us = parseInt(scoreL.value || '0', 10) || 0;
+        model.score.them = parseInt(scoreR.value || '0', 10) || 0;
+        model.opponent = (inpOpp.value || '').trim();
+      }
+      const r = await updateDay(dateIso, { matchUpsert: model });
+      if (typeof onSaved === 'function') onSaved(r.calendar);
+      close();
+    } catch (e) { alert(e.message); }
+  };
+
+  function close() { modal.classList.remove('show'); modal.style.display = 'none'; }
+  function backdropClose(ev) { if (ev.target === modal) close(); }
+  closeBtn.onclick = close;
+  modal.addEventListener('click', backdropClose);
+
+  modal.style.display = 'flex';
+  modal.classList.add('show');
+}
+
+function makeMatchBar(dateIso, dayItem, afterUpdate) {
+  const wrap = document.createElement('div');
+  wrap.style.display = 'flex';
+  wrap.style.justifyContent = 'space-between';
+  wrap.style.alignItems = 'center';
+  wrap.style.gap = '8px';
+  wrap.style.margin = '8px 0';
+
+  const pill = document.createElement('div');
+  pill.className = 'pill';
+  pill.textContent = 'Matchs: —';
+  wrap.appendChild(pill);
+
+  function lastSummary() {
+    const arr = Array.isArray(dayItem.matches) ? dayItem.matches : (dayItem.match ? [dayItem.match] : []);
+    if (!arr.length) return 'Matchs: 0';
+    const m = arr[arr.length - 1];
+    if (m.kind === 'training') {
+      const a = Number(m.teamA?.score || 0), b = Number(m.teamB?.score || 0);
+      return `Dernier: A–B ${a}-${b} · Total ${arr.length}`;
+    } else {
+      const us = Number(m.score?.us || 0), them = Number(m.score?.them || 0);
+      const opp = m.opponent ? ` vs ${m.opponent}` : '';
+      return `Dernier:${opp} ${us}-${them} · Total ${arr.length}`;
+    }
+  }
+  pill.textContent = lastSummary();
+
+  const btn = document.createElement('button');
+  btn.className = 'btn'; btn.textContent = 'Gérer les matchs';
+  btn.onclick = async () => {
+    try {
+      const players = await __loadPlayersSafe();
+      openMatchesManager(dateIso, dayItem, players, (cal) => {
+        if (cal && typeof afterUpdate === 'function') afterUpdate(cal);
+        if (cal) {
+          const updated = (cal.items || []).find(x => x.date === dateIso);
+          if (updated) Object.assign(dayItem, updated);
+        }
+        pill.textContent = lastSummary();
+      });
+    } catch (e) { alert(e.message); }
+  };
+  wrap.appendChild(btn);
+
+  return wrap;
+}
+
+// Gestionnaire de la liste des matchs (modale)
+function openMatchesManager(dateIso, dayItem, players, onSaved) {
+  // Simple manager using the existing chooser modal structure
+  ensureChooserDom();
+  const modal = document.getElementById('chooser');
+  const titleEl = document.getElementById('chooser-title');
+  const grid = document.getElementById('chooser-grid');
+  const search = document.getElementById('chooser-search');
+  const closeBtn = document.getElementById('chooser-close');
+
+  function close() { modal.classList.remove('show'); modal.style.display = 'none'; }
+
+  titleEl.textContent = `Matchs — ${dateIso}`;
+  search.placeholder = 'Rechercher adversaire / type...';
+
+  function summarize(m) {
+    if (m.kind === 'training') {
+      return `Entraînement · A–B ${Number(m.teamA?.score || 0)}-${Number(m.teamB?.score || 0)}`;
+    } else {
+      return `Plateau · ${m.opponent || 'Adversaire ?'} · ${Number(m.score?.us || 0)}-${Number(m.score?.them || 0)}`;
+    }
+  }
+
+  function renderList(q = '') {
+    grid.innerHTML = '';
+    const list = Array.isArray(dayItem.matches) ? [...dayItem.matches] : (dayItem.match ? [dayItem.match] : []);
+    const ql = q.trim().toLowerCase();
+    list
+      .filter(m => !ql || summarize(m).toLowerCase().includes(ql))
+      .forEach(m => {
+        const card = document.createElement('div');
+        card.className = 'item';
+        card.innerHTML = `<div class="band"></div><h3>${summarize(m)}</h3>`;
+        const row = document.createElement('div');
+        row.style.display = 'flex'; row.style.gap = '6px';
+
+        const edit = document.createElement('button'); edit.className = 'btn'; edit.textContent = 'Modifier';
+        edit.onclick = () => {
+          close();
+          openMatchModal(dateIso, dayItem, players, (cal) => { if (typeof onSaved === 'function') onSaved(cal); }, m);
+        };
+
+        const del = document.createElement('button'); del.className = 'btn danger'; del.textContent = 'Supprimer';
+        del.onclick = async () => {
+          if (!confirm('Supprimer ce match ?')) return;
+          try {
+            const r = await updateDay(dateIso, { matchDeleteId: m.id });
+            if (typeof onSaved === 'function') onSaved(r.calendar);
+            // refresh local snapshot
+            if (r.calendar) {
+              const updated = (r.calendar.items || []).find(x => x.date === dateIso);
+              if (updated) Object.assign(dayItem, updated);
+            }
+            renderList(search.value);
+          } catch (e) { alert(e.message); }
+        };
+
+        row.appendChild(edit); row.appendChild(del);
+        card.appendChild(row);
+        grid.appendChild(card);
+      });
+
+    // Bouton Nouveau
+    const addCard = document.createElement('div');
+    addCard.className = 'item';
+    const h = document.createElement('h3'); h.textContent = 'Nouveau match';
+    const p = document.createElement('p'); p.textContent = 'Créer un match d\'entraînement (A/B) ou de plateau (Nous vs adv.)';
+    const addTrain = document.createElement('button'); addTrain.className = 'btn'; addTrain.textContent = 'Match d\'entrainement';
+    addTrain.onclick = () => { close(); dayItem.match = { id: uid(), kind: 'training', teamA: { starters: [], subs: [], score: 0 }, teamB: { starters: [], subs: [], score: 0 }, scorers: [] }; openMatchModal(dateIso, dayItem, players, onSaved, dayItem.match); };
+    const addPlat = document.createElement('button'); addPlat.className = 'btn'; addPlat.textContent = 'Match de plateau';
+    addPlat.onclick = () => { close(); dayItem.match = { id: uid(), kind: 'plateau', opponent: '', our: { starters: [], subs: [] }, score: { us: 0, them: 0 }, scorers: [] }; openMatchModal(dateIso, dayItem, players, onSaved, dayItem.match); };
+    addCard.appendChild(h); addCard.appendChild(p); addCard.appendChild(addTrain); addCard.appendChild(addPlat);
+    grid.appendChild(addCard);
+  }
+
+  closeBtn.onclick = close;
+  search.oninput = () => renderList(search.value);
+
+  renderList();
+  modal.style.display = 'flex'; modal.classList.add('show');
+}
 
 // Retourne un tableau de { id, display, full } où display suit la règle : "Prénom N." (ou plus de lettres si prénoms identiques)
 function computeRosterDisplay(players) {
@@ -222,6 +636,15 @@ function computeRosterDisplay(players) {
 }
 
 async function loadPlayers() {
+  const r = await fetch("/api/players", { cache: "no-store" });
+  if (!r.ok) throw new Error("Erreur chargement effectif");
+  const j = await r.json();
+  return j.players || [];
+}
+
+// Fallback loader for players (used by attendance bar)
+async function __loadPlayersSafe() {
+  if (typeof loadPlayers === "function") return await loadPlayers();
   const r = await fetch("/api/players", { cache: "no-store" });
   if (!r.ok) throw new Error("Erreur chargement effectif");
   const j = await r.json();
@@ -775,7 +1198,7 @@ function ensureChooserDom() {
   if (document.getElementById("chooser")) return;
   const el = document.createElement("div");
   el.innerHTML = `
-  < div class="modal" id = "chooser" style = "display:none;" >
+  <div class="modal" id="chooser" style="display:none;">
     <div class="modal-card">
       <div class="modal-head" style="display:flex;gap:8px;align-items:center;justify-content:space-between;">
         <strong id="chooser-title">Choisir</strong>
@@ -784,7 +1207,7 @@ function ensureChooserDom() {
       </div>
       <div class="grid" id="chooser-grid"></div>
     </div>
-  </div > `;
+  </div>`;
   document.body.appendChild(el.firstElementChild);
 }
 
@@ -877,6 +1300,7 @@ function renderDayCard(it, calendar, catalog, usages, rerenderAll) {
   }
 
   const isTraining = (it.weekday === "mercredi") || (it.weekday === "samedi" && it.type === "entrainement");
+  const isPlateau = (it.weekday === "samedi" && it.type === "plateau");
 
   // --- Contrôles 'samedi' quand on est en mode entraînement ---
   if (isTraining && it.weekday === "samedi") {
@@ -916,6 +1340,14 @@ function renderDayCard(it, calendar, catalog, usages, rerenderAll) {
     saturdayBar.appendChild(btnToLibre);
 
     card.appendChild(saturdayBar);
+
+    // Résumé présences (mercredi et samedi entraînement)
+    if (isTraining) {
+      const attBar = makeAttendanceBar(it.date);
+      card.appendChild(attBar);
+    }
+    // Barre Match (entraînement)
+    card.appendChild(makeMatchBar(it.date, it, (cal) => { if (cal) rerenderAll(cal); }));
   }
 
   if (!isTraining) {
@@ -929,6 +1361,13 @@ function renderDayCard(it, calendar, catalog, usages, rerenderAll) {
         const loc = document.createElement("p");
         loc.innerHTML = `Lieu du plateau : <strong>${it.plateauLieu || "—"}</strong>`;
         card.appendChild(loc);
+
+        // Résumé présences pour plateau
+        const attBar = makeAttendanceBar(it.date);
+        card.appendChild(attBar);
+
+        // Barre Match (plateau)
+        card.appendChild(makeMatchBar(it.date, it, (cal) => { if (cal) rerenderAll(cal); }));
 
         const row = document.createElement("div");
         row.style.display = "flex";
@@ -1119,25 +1558,13 @@ function renderDayCard(it, calendar, catalog, usages, rerenderAll) {
 `;
   card.appendChild(match);
 
-  const bar = document.createElement("div");
-  bar.style.display = "flex";
-  bar.style.justifyContent = "flex-end";
-  bar.style.gap = "8px";
-  bar.style.marginBottom = "8px";
-
-  const btnAtt = document.createElement("button");
-  btnAtt.className = "btn";
-  btnAtt.textContent = "Présences";
-  btnAtt.onclick = async () => {
-    try {
-      // charge les joueurs puis ouvre la modale
-      const players = await loadPlayers(); // tu l'as déjà côté effectif
-      openAttendanceModal(it.date, players);
-    } catch (e) { alert(e.message); }
-  };
-
-  bar.appendChild(btnAtt);
-  card.prepend(bar);
+  // Résumé présences (mercredi et samedi entraînement)
+  if (isTraining) {
+    const attBar = makeAttendanceBar(it.date);
+    card.appendChild(attBar);
+    // Barre Match (entraînement / fin de carte)
+    card.appendChild(makeMatchBar(it.date, it, (cal) => { if (cal) rerenderAll(cal); }));
+  }
 
   return card;
 }
