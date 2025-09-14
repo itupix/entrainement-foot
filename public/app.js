@@ -582,6 +582,19 @@ function openMatchesManager(dateIso, dayItem, players, onSaved) {
   modal.style.display = 'flex'; modal.classList.add('show');
 }
 
+async function updatePlayer(id, first_name, last_name) {
+  const r = await fetch(`/api/players/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ first_name, last_name })
+  });
+  if (!r.ok) {
+    const j = await r.json().catch(() => ({}));
+    throw new Error(j.error || "Erreur mise à jour");
+  }
+  return (await r.json()).player;
+}
+
 // Retourne un tableau de { id, display, full } où display suit la règle : "Prénom N." (ou plus de lettres si prénoms identiques)
 function computeRosterDisplay(players) {
   const byFirst = new Map();
@@ -691,18 +704,79 @@ function renderRosterList(players) {
                       <div class="roster-meta">${d.full}</div>`;
     const right = document.createElement("div");
 
+    // boutons / inputs pour édition inline
+    let editMode = false;
+    const btnEdit = document.createElement("button");
+    btnEdit.className = "btn";
+    btnEdit.textContent = "Modifier";
+
+    const btnSave = document.createElement("button");
+    btnSave.className = "btn";
+    btnSave.textContent = "Enregistrer";
+    btnSave.style.display = "none";
+
+    const btnCancel = document.createElement("button");
+    btnCancel.className = "btn";
+    btnCancel.textContent = "Annuler";
+    btnCancel.style.display = "none";
+
     const del = document.createElement("button");
     del.className = "btn danger";
     del.textContent = "Suppr.";
+
+    const inFirst = document.createElement("input");
+    const inLast = document.createElement("input");
+    inFirst.style.display = "none";
+    inLast.style.display = "none";
+    inFirst.placeholder = "Prénom";
+    inLast.placeholder = "Nom";
+    inFirst.value = p.first_name || "";
+    inLast.value = p.last_name || "";
+
+    function setEdit(on) {
+      editMode = on;
+      // inputs visibles en mode édition
+      inFirst.style.display = inLast.style.display = on ? "inline-block" : "none";
+      // boutons
+      btnEdit.style.display = on ? "none" : "inline-block";
+      btnSave.style.display = btnCancel.style.display = on ? "inline-block" : "none";
+      // texte
+      left.innerHTML = on
+        ? `<div class="roster-meta">Édition de ${d.full}</div>`
+        : `<div class="roster-name">${d.display}</div><div class="roster-meta">${d.full}</div>`;
+    }
+
+    btnEdit.onclick = () => setEdit(true);
+    btnCancel.onclick = () => {
+      inFirst.value = p.first_name || "";
+      inLast.value = p.last_name || "";
+      setEdit(false);
+    };
+    btnSave.onclick = async () => {
+      const fn = (inFirst.value || "").trim();
+      const ln = (inLast.value || "").trim();
+      if (!fn || !ln) return alert("Prénom et nom requis");
+      try {
+        await updatePlayer(p.id, fn, ln);
+        const refreshed = await loadPlayers();
+        renderRosterList(refreshed);
+      } catch (e) { alert(e.message); }
+    };
     del.onclick = async () => {
       if (!confirm(`Supprimer ${d.full} ?`)) return;
       try {
-        await deletePlayer(d.id);
+        await deletePlayer(p.id);
         const refreshed = await loadPlayers();
         renderRosterList(refreshed);
       } catch (e) { alert(e.message); }
     };
 
+    right.style.display = "flex"; right.style.gap = "6px"; right.style.flexWrap = "wrap";
+    right.appendChild(inFirst);
+    right.appendChild(inLast);
+    right.appendChild(btnSave);
+    right.appendChild(btnCancel);
+    right.appendChild(btnEdit);
     right.appendChild(del);
     row.appendChild(left);
     row.appendChild(right);

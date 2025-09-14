@@ -245,6 +245,30 @@ app.get("/api/calendar", async (_req, res) => {
   }
 });
 
+// PUT /api/players/:id  -> modifier prénom/nom
+app.put("/api/players/:id", async (req, res) => {
+  try {
+    if (!pool) return res.status(500).json({ error: "DB non initialisée" });
+    const id = req.params.id;
+    const fn = (req.body?.first_name || "").trim();
+    const ln = (req.body?.last_name || "").trim();
+    if (!fn || !ln) return res.status(400).json({ error: "Prénom et nom requis" });
+
+    const { rows } = await pool.query(
+      `UPDATE players
+         SET first_name = $1, last_name = $2
+       WHERE id = $3
+       RETURNING id, first_name, last_name, created_at`,
+      [fn, ln, id]
+    );
+    if (!rows.length) return res.status(404).json({ error: "Joueur introuvable" });
+    res.json({ player: rows[0] });
+  } catch (e) {
+    console.error("[players] PUT error:", e);
+    res.status(500).json({ error: "Erreur mise à jour" });
+  }
+});
+
 app.post("/api/day/:date", async (req, res) => {
   try {
     await ensureTable();
