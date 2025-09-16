@@ -833,19 +833,19 @@ svg .selected {
 }
 
 .roster-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 10px
+  display: flex;
+  flex-direction: column;
 }
 
 .roster-item {
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
   padding: 10px;
-  background: #fff;
   display: flex;
   align-items: center;
   justify-content: space-between
+}
+
+.roster-item:not(:last-child) {
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .roster-name {
