@@ -877,17 +877,73 @@ function findNextPlannedDate(calendar, fromIso) {
 // Onglets
 // -----------------------
 function initTabs() {
-  document.querySelectorAll(".tab").forEach((tab) => {
-    tab.addEventListener("click", () => {
-      document.querySelectorAll(".tab").forEach((t) => t.classList.remove("active"));
-      document.querySelectorAll(".view").forEach((v) => v.classList.remove("active"));
-      tab.classList.add("active");
+  document.querySelectorAll('.tab').forEach((tab) => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach((t) => t.classList.remove('active'));
+      document.querySelectorAll('.view').forEach((v) => v.classList.remove('active'));
+      tab.classList.add('active');
       const view = document.getElementById(tab.dataset.target);
-      if (view) view.classList.add("active");
+      if (view) view.classList.add('active');
       updateFabVisibility();
+      if (tab.dataset.target === 'view-stats' && typeof renderStatsPage === 'function') {
+        renderStatsPage();
+      }
     });
   });
 }
+
+// Stats view (Plateaux & Entraînements)
+// -----------------------
+function renderStatsPage() {
+  const root = document.getElementById('view-stats');
+  if (!root) return;
+  root.innerHTML = `<div class="card"><h3>Statistiques</h3><p id="stats-status">Chargement…</p></div>`;
+
+  fetch('/api/stats', { cache: 'no-store' })
+    .then(r => { if (!r.ok) throw new Error('Erreur chargement des statistiques'); return r.json(); })
+    .then(data => {
+      const emptyStats = { results: { wins: 0, draws: 0, losses: 0 }, countMatches: 0, topScorers: [] };
+      const plat = data.plateau || emptyStats;
+      const ent = data.training || { countMatches: 0, topScorers: [] };
+
+      const kpiPlateau = (s) => `
+        <div class="kpis">
+          <span class="pill">Victoires: ${s.results?.wins || 0}</span>
+          <span class="pill">Nuls: ${s.results?.draws || 0}</span>
+          <span class="pill">Défaites: ${s.results?.losses || 0}</span>
+          <span class="pill">Matches: ${s.countMatches || 0}</span>
+        </div>`;
+      const kpiTraining = (s) => `
+        <div class="kpis">
+          <span class="pill">Séances: ${s.countMatches || 0}</span>
+        </div>`;
+      const scorersList = (s) => {
+        const arr = Array.isArray(s.topScorers) ? s.topScorers : [];
+        if (!arr.length) return '<p>Aucun buteur pour l\u2019instant.</p>';
+        return `<ol class="scorers">${arr.map(x => `<li>${x.name} — ${x.goals}</li>`).join('')}</ol>`;
+      };
+
+      root.innerHTML = `
+        <div class="card">
+          <h3>Plateaux</h3>
+          ${kpiPlateau(plat)}
+          <h4>Meilleurs buteurs</h4>
+          ${scorersList(plat)}
+        </div>
+        <div class="card">
+          <h3>Entraînements</h3>
+          ${kpiTraining(ent)}
+          <h4>Meilleurs buteurs</h4>
+          ${scorersList(ent)}
+          <p class="roster-meta">Les V/N/D ne sont pas comptés pour les entraînements.</p>
+        </div>`;
+    })
+    .catch(e => {
+      root.innerHTML = `<div class="card"><h3>Statistiques</h3><p style="color:#b91c1c;">${e.message || 'Erreur de chargement'}</p></div>`;
+    });
+}
+
+// -----------------------
 
 // -----------------------
 // FAB (+)
