@@ -16,6 +16,26 @@ const CLUB_NAME = process.env.CLUB_NAME || "Mon Club U8";
 // Pour compter V/N/D sur un entraînement interne (matchs en 2 équipes),
 // choisis le côté que l'on considère comme "nous" : "teamA" | "teamB" | null
 const TRAINING_INTERNAL_CLUB_SIDE = process.env.TRAINING_INTERNAL_CLUB_SIDE || null;
+// === Positions joueurs ===
+const POSITIONS = ["attaquant", "milieu", "défenseur", "gardien"];
+function normalizePosition(p) {
+  if (!p) return null;
+  const s = String(p).trim().toLowerCase();
+  if (["milieux", "milieu", "m"].includes(s)) return "milieu";
+  if (["attaquant", "att", "a"].includes(s)) return "attaquant";
+  if (["défenseur", "defenseur", "def", "d"].includes(s)) return "défenseur";
+  if (["gardien", "gk", "g"].includes(s)) return "gardien";
+  return null; // invalide -> rejet
+}
+async function ensurePlayersPositionColumns() {
+  try {
+    if (useFs) return; // pas de migration en mode FS
+    await pool.query('ALTER TABLE players ADD COLUMN IF NOT EXISTS primary_position text');
+    await pool.query('ALTER TABLE players ADD COLUMN IF NOT EXISTS secondary_position text');
+  } catch (e) {
+    console.warn('[migrate] positions columns', e.message);
+  }
+}
 // =================================
 
 // --- Utilitaires date ---
@@ -482,17 +502,43 @@ app.put("/api/players/:id", async (req, res) => {
   try {
     if (!pool) return res.status(500).json({ error: "DB non initialisée" });
     const id = req.params.id;
-    const fn = (req.body?.first_name || "").trim();
-    const ln = (req.body?.last_name || "").trim();
-    if (!fn || !ln) return res.status(400).json({ error: "Prénom et nom requis" });
+    const hasFN = typeof req.body?.first_name === 'string';
+    const hasLN = typeof req.body?.last_name === 'string';
+    const hasPP = typeof req.body?.primary_position !== 'undefined';
+    const hasSP = typeof req.body?.secondary_position !== 'undefined';
 
-    const { rows } = await pool.query(
-      `UPDATE players
-         SET first_name = $1, last_name = $2
-       WHERE id = $3
-       RETURNING id, first_name, last_name, created_at`,
-      [fn, ln, id]
-    );
+    if (!hasFN && !hasLN && !hasPP && !hasSP) {
+      return res.status(400).json({ error: "Aucun champ à mettre à jour" });
+    }
+
+    const setParts = [];
+    const values = [];
+    let i = 1;
+
+    if (hasFN) {
+      const fn = (req.body.first_name || '').trim();
+      if (!fn) return res.status(400).json({ error: "first_name vide" });
+      setParts.push(`first_name = $${i++}`); values.push(fn);
+    }
+    if (hasLN) {
+      const ln = (req.body.last_name || '').trim();
+      if (!ln) return res.status(400).json({ error: "last_name vide" });
+      setParts.push(`last_name = $${i++}`); values.push(ln);
+    }
+    if (hasPP) {
+      const pp = normalizePosition(req.body.primary_position);
+      if (req.body.primary_position && !pp) return res.status(400).json({ error: "primary_position invalide (attaquant|milieu|défenseur|gardien)" });
+      setParts.push(`primary_position = $${i++}`); values.push(pp);
+    }
+    if (hasSP) {
+      const sp = normalizePosition(req.body.secondary_position);
+      if (req.body.secondary_position && !sp) return res.status(400).json({ error: "secondary_position invalide (attaquant|milieu|défenseur|gardien)" });
+      setParts.push(`secondary_position = $${i++}`); values.push(sp);
+    }
+
+    values.push(id);
+    const sql = `UPDATE players SET ${setParts.join(', ')} WHERE id = $${i} RETURNING id, first_name, last_name, primary_position, secondary_position, created_at`;
+    const { rows } = await pool.query(sql, values);
     if (!rows.length) return res.status(404).json({ error: "Joueur introuvable" });
     res.json({ player: rows[0] });
   } catch (e) {
@@ -557,9 +603,9 @@ app.post("/api/day/:date", async (req, res) => {
 app.get("/api/players", async (req, res) => {
   try {
     const { rows } = await pool.query(
-      `SELECT id, first_name, last_name, created_at
-       FROM players
-       ORDER BY lower(first_name), lower(last_name)`
+      `SELECT id, first_name, last_name, primary_position, secondary_position, created_at
+ FROM players
+ ORDER BY lower(first_name), lower(last_name)`
     );
     res.json({ players: rows });
   } catch (e) {
@@ -576,11 +622,16 @@ app.post("/api/players", async (req, res) => {
     const ln = (req.body?.last_name || "").trim();
     if (!fn || !ln) return res.status(400).json({ error: "Prénom et nom requis" });
 
+    const pp = normalizePosition(req.body?.primary_position);
+    const sp = normalizePosition(req.body?.secondary_position);
+    if (req.body?.primary_position && !pp) return res.status(400).json({ error: "primary_position invalide (attaquant|milieu|défenseur|gardien)" });
+    if (req.body?.secondary_position && !sp) return res.status(400).json({ error: "secondary_position invalide (attaquant|milieu|défenseur|gardien)" });
+
     const { rows } = await pool.query(
-      `INSERT INTO players (first_name, last_name)
-       VALUES ($1,$2)
-       RETURNING id, first_name, last_name, created_at`,
-      [fn, ln]
+      `INSERT INTO players (first_name, last_name, primary_position, secondary_position)
+ VALUES ($1,$2,$3,$4)
+ RETURNING id, first_name, last_name, primary_position, secondary_position, created_at`,
+      [fn, ln, pp, sp]
     );
     res.json({ player: rows[0] });
   } catch (e) {
@@ -599,6 +650,11 @@ app.delete("/api/players/:id", async (req, res) => {
     console.error("[players] DELETE error:", e);
     res.status(500).json({ error: "Erreur suppression" });
   }
+});
+
+// Positions list
+app.get('/api/positions', (_req, res) => {
+  res.json({ positions: POSITIONS });
 });
 
 // GET /api/attendance/:date  -> liste des statuts pour la date
@@ -866,6 +922,7 @@ const PORT = process.env.PORT || 3000;
 (async () => {
   try {
     await ensureTable();
+    await ensurePlayersPositionColumns();
     console.log(`[BOOT] Storage: ${useFs ? "filesystem (local)" : "Postgres"}`);
     app.listen(PORT, () => console.log(`➡️  http://localhost:${PORT}`));
   } catch (e) {

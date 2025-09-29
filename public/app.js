@@ -582,15 +582,36 @@ function openMatchesManager(dateIso, dayItem, players, onSaved) {
   modal.style.display = 'flex'; modal.classList.add('show');
 }
 
-async function updatePlayer(id, first_name, last_name) {
+async function updatePlayer(id, first_name, last_name, extra = {}) {
+  const body = { first_name, last_name, ...extra };
   const r = await fetch(`/api/players/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ first_name, last_name })
+    body: JSON.stringify(body)
   });
   if (!r.ok) {
     const j = await r.json().catch(() => ({}));
     throw new Error(j.error || "Erreur mise à jour");
+  }
+  return (await r.json()).player;
+}
+
+async function fetchPositionsList() {
+  const r = await fetch('/api/positions', { cache: 'no-store' });
+  if (!r.ok) throw new Error('Erreur chargement postes');
+  const j = await r.json();
+  return Array.isArray(j.positions) ? j.positions : ["attaquant", "milieu", "défenseur", "gardien"]; // fallback si endpoint manquant
+}
+
+async function updatePlayerPositions(id, primary_position, secondary_position) {
+  const r = await fetch(`/api/players/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ primary_position, secondary_position })
+  });
+  if (!r.ok) {
+    const j = await r.json().catch(() => ({}));
+    throw new Error(j.error || 'Erreur mise à jour postes');
   }
   return (await r.json()).player;
 }
@@ -648,6 +669,39 @@ function computeRosterDisplay(players) {
   return out;
 }
 
+// --- Participation counters (per player) ---
+async function fetchCalendarAll() {
+  const r = await fetch('/api/calendar', { cache: 'no-store' });
+  if (!r.ok) throw new Error('Erreur chargement calendrier');
+  return await r.json();
+}
+
+function computeParticipationCountsFromCalendar(players, calendar) {
+  const ids = new Set((players || []).map(p => p.id));
+  const counts = new Map();
+  (players || []).forEach(p => counts.set(p.id, { plateaux: 0, entrainements: 0 }));
+
+  const items = (calendar && Array.isArray(calendar.items)) ? calendar.items : [];
+  for (const day of items) {
+    const matches = Array.isArray(day.matches) ? day.matches : (day.match ? [day.match] : []);
+    for (const m of matches) {
+      if (m && m.kind === 'plateau') {
+        const our = m.our || {};
+        const part = new Set([...(our.starters || []), ...(our.subs || [])]);
+        for (const pid of part) {
+          if (ids.has(pid)) counts.get(pid).plateaux += 1;
+        }
+      } else if (m && m.kind === 'training') {
+        const part = new Set([...(m.teamA?.starters || []), ...(m.teamA?.subs || []), ...(m.teamB?.starters || []), ...(m.teamB?.subs || [])]);
+        for (const pid of part) {
+          if (ids.has(pid)) counts.get(pid).entrainements += 1;
+        }
+      }
+    }
+  }
+  return counts;
+}
+
 async function loadPlayers() {
   const r = await fetch("/api/players", { cache: "no-store" });
   if (!r.ok) throw new Error("Erreur chargement effectif");
@@ -686,13 +740,30 @@ async function deletePlayer(id) {
   return true;
 }
 
-function renderRosterList(players) {
+async function renderRosterList(players) {
   const list = document.getElementById("roster-list");
   if (!list) return;
   list.innerHTML = "";
 
+  // Charger calendrier pour compter participations (plateaux / entraînements)
+  let calendar = null;
+  try { calendar = await fetchCalendarAll(); } catch (e) { /* silencieux: pas bloquant */ }
+  const PARTIC_COUNTS = calendar ? computeParticipationCountsFromCalendar(players, calendar) : new Map();
+
+  let POS = [];
+  try { POS = await fetchPositionsList(); }
+  catch (_) { POS = ["attaquant", "milieu", "défenseur", "gardien"]; }
+  const POS_OPTS = ["", ...POS]; // vide = non défini
+
   const display = computeRosterDisplay(players);
   const map = new Map(players.map(p => [p.id, p]));
+
+  function leftContentHTML(d, p) {
+    const c = PARTIC_COUNTS.get(p.id) || { plateaux: 0, entrainements: 0 };
+    return `<div class="roster-name">${d.display}</div>
+            <div class="roster-meta">${d.full}</div>
+            <div class="roster-meta">Plateaux: ${c.plateaux} · Entraînements: ${c.entrainements}</div>`;
+  }
 
   display.forEach(d => {
     const p = map.get(d.id);
@@ -700,8 +771,7 @@ function renderRosterList(players) {
     row.className = "roster-item";
 
     const left = document.createElement("div");
-    left.innerHTML = `<div class="roster-name">${d.display}</div>
-                      <div class="roster-meta">${d.full}</div>`;
+    left.innerHTML = leftContentHTML(d, p);
     const right = document.createElement("div");
 
     // boutons / inputs pour édition inline
@@ -733,6 +803,40 @@ function renderRosterList(players) {
     inFirst.value = p.first_name || "";
     inLast.value = p.last_name || "";
 
+    // --- Positions (principal / secondaire) ---
+    const selPrimary = document.createElement('select');
+    selPrimary.title = 'Poste principal';
+    POS_OPTS.forEach(v => { const o = document.createElement('option'); o.value = v; o.textContent = v || '—'; selPrimary.appendChild(o); });
+    selPrimary.value = p.primary_position || '';
+
+    const selSecondary = document.createElement('select');
+    selSecondary.title = 'Poste secondaire';
+    POS_OPTS.forEach(v => { const o = document.createElement('option'); o.value = v; o.textContent = v || '—'; selSecondary.appendChild(o); });
+    selSecondary.value = p.secondary_position || '';
+
+    const posStatus = document.createElement('span');
+    posStatus.className = 'roster-meta';
+    posStatus.style.minWidth = '120px';
+
+    async function savePositions() {
+      const pp = selPrimary.value || null;
+      const sp = selSecondary.value || null;
+      try {
+        selPrimary.disabled = selSecondary.disabled = true;
+        posStatus.textContent = '…';
+        await updatePlayerPositions(p.id, pp, sp);
+        posStatus.textContent = 'Enregistré';
+        setTimeout(() => { posStatus.textContent = ''; }, 800);
+      } catch (e) {
+        posStatus.textContent = e.message || 'Erreur';
+      } finally {
+        selPrimary.disabled = selSecondary.disabled = false;
+      }
+    }
+
+    selPrimary.addEventListener('change', savePositions);
+    selSecondary.addEventListener('change', savePositions);
+
     function setEdit(on) {
       editMode = on;
       // inputs visibles en mode édition
@@ -743,7 +847,7 @@ function renderRosterList(players) {
       // texte
       left.innerHTML = on
         ? `<div class="roster-meta">Édition de ${d.full}</div>`
-        : `<div class="roster-name">${d.display}</div><div class="roster-meta">${d.full}</div>`;
+        : leftContentHTML(d, p);
     }
 
     btnEdit.onclick = () => setEdit(true);
@@ -759,7 +863,7 @@ function renderRosterList(players) {
       try {
         await updatePlayer(p.id, fn, ln);
         const refreshed = await loadPlayers();
-        renderRosterList(refreshed);
+        await renderRosterList(refreshed);
       } catch (e) { alert(e.message); }
     };
     del.onclick = async () => {
@@ -767,11 +871,16 @@ function renderRosterList(players) {
       try {
         await deletePlayer(p.id);
         const refreshed = await loadPlayers();
-        renderRosterList(refreshed);
+        await renderRosterList(refreshed);
       } catch (e) { alert(e.message); }
     };
 
     right.style.display = "flex"; right.style.gap = "6px"; right.style.flexWrap = "wrap";
+    // Positions controls first
+    right.appendChild(selPrimary);
+    right.appendChild(selSecondary);
+    right.appendChild(posStatus);
+    // Then name edit controls
     right.appendChild(inFirst);
     right.appendChild(inLast);
     right.appendChild(btnSave);
@@ -2141,7 +2250,7 @@ function toggleCalendar() {
 
   let roster = [];
   async function refreshRoster() {
-    try { roster = await loadPlayers(); renderRosterList(roster); }
+    try { roster = await loadPlayers(); await renderRosterList(roster); }
     catch (e) { console.warn("Effectif: ", e.message); }
   }
 
